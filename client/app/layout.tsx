@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import ProtectedRoutes from "./components/ProtectedRoutes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,10 +27,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <title>Cake Management Tool</title>
+        <meta name="description" content="Cake Management Tool" />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-max`}
       >
-        {children}
+        <ProtectedRoutes>
+          <Header />
+          {children}
+          <Footer />
+        </ProtectedRoutes>
       </body>
     </html>
   );

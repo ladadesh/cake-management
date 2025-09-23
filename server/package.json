@@ -1,0 +1,40 @@
+{
+  "name": "cake-backend",
+  "version": "1.0.0",
+  "description": "Cake Management Backend with Node.js, Express, MongoDB, Cloudinary and Sharp",
+  "main": "src/index.js",
+  "type" :"module",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "build": "tsc"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "mongodb",
+    "cloudinary",
+    "sharp",
+    "cake-management"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "cloudinary": "^2.5.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "mongoose": "^8.7.0",
+    "multer": "^1.4.5-lts.1",
+    "sharp": "^0.33.3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.21",
+    "@types/multer": "^1.4.7",
+    "@types/node": "^20.12.12",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  }
+}

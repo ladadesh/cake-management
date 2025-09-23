@@ -1,0 +1,22 @@
+export type UserRole = "superuser" | "owner" | "employee" | "delivery";
+
+export const ROLE_PAGES: Record<UserRole, string[]> = {
+  superuser: [
+    "/",
+    "/place-order",
+    "/orders",
+    "/admin",
+    "/users",
+    "/upload-slip",
+  ],
+  owner: ["/", "/place-order", "/orders", "/users", "/upload-slip"],
+  employee: ["/", "/upload-slip", "/slip-list"],
+  delivery: ["/", "/orders", "/upload-slip"],
+};
+
+export const branches = [
+  { id: "khamla", name: "Khamla" },
+  { id: "sakkardara", name: "Sakkardara" },
+  { id: "dharampeth", name: "Dharampeth" },
+  { id: "kapilNagar", name: "Kapil Nagar" },
+];
