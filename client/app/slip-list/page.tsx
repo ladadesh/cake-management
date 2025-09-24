@@ -3,7 +3,6 @@ import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import Loader from "../components/Loader";
 import { branches } from "../constants/roles";
-import Image from "next/image";
 
 interface Slip {
   _id: string;
