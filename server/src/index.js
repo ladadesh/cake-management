@@ -17,6 +17,15 @@ app.use(
   })
 );
 
+// test routes to check if URL is working
+app.get("/api/test", (req, res) => {
+  res.json({ status: "ok", message: "API is working" });
+});
+
+app.get("/", (req, res) => {
+  res.send("Server is running");
+});
+
 //routes
 app.use("/api/slips", slipRoutes);
 

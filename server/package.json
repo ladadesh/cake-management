@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "build": "tsc"
+    "build": "echo \"No build step needed for plain JS\""
   },
   "keywords": [
     "node",
