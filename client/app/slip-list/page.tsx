@@ -155,13 +155,14 @@ export default function SlipList() {
 
   return (
     <div className="h-screen flex flex-col">
-      {loading && <Loader />}
+      {loading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center ">
+          <Loader />
+        </div>
+      )}
 
       {/* Top: sticky header / controls */}
-      <div
-        className="flex-none sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b"
-        style={{ zIndex: -1 }}
-      >
+      <div className="flex-none sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b">
         <div className="p-5 mx-5">
           <div className="flex items-center justify-between mb-4 sm:flex flex-col sm:items-start sm:gap-3">
             <h3 className="text-2xl font-semibold">Branches</h3>
