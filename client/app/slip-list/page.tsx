@@ -152,9 +152,12 @@ const page = () => {
       {loading && <Loader />}
 
       {/* Top: sticky header / controls */}
-      <div className="flex-none sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b">
+      <div
+        className="flex-none sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b"
+        style={{ zIndex: -1 }}
+      >
         <div className="p-5 mx-5">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4 sm:flex flex-col sm:items-start sm:gap-3">
             <h3 className="text-2xl font-semibold">Branches</h3>
           </div>
 
@@ -204,47 +207,49 @@ const page = () => {
                 />
               </div>
 
-              <div className="ml-4 flex-shrink-0 flex items-center gap-2">
-                <button
-                  onClick={() => setSelectedDateFilter("all")}
-                  className={`px-3 py-2 border rounded-md text-sm ${
-                    selectedDateFilter === "all"
-                      ? "bg-pink-500 text-white border-pink-500"
-                      : "bg-pink-50 text-gray-700 border-pink-400"
-                  }`}
-                >
-                  All
-                </button>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 flex flex-wrap gap-3">
+                  <button
+                    onClick={() => setSelectedDateFilter("all")}
+                    className={`px-3 py-2 border rounded-md text-sm ${
+                      selectedDateFilter === "all"
+                        ? "bg-pink-500 text-white border-pink-500"
+                        : "bg-pink-50 text-gray-700 border-pink-400"
+                    }`}
+                  >
+                    All
+                  </button>
 
-                <button
-                  onClick={() =>
-                    setSelectedDateFilter(
-                      selectedDateFilter === "today" ? "all" : "today"
-                    )
-                  }
-                  className={`px-3 py-2 border rounded-md text-sm ${
-                    selectedDateFilter === "today"
-                      ? "bg-pink-500 text-white border-pink-500"
-                      : "bg-pink-50 text-gray-700 border-pink-400"
-                  }`}
-                >
-                  Today: {formatShortDate(today)}
-                </button>
+                  <button
+                    onClick={() =>
+                      setSelectedDateFilter(
+                        selectedDateFilter === "today" ? "all" : "today"
+                      )
+                    }
+                    className={`px-3 py-2 border rounded-md text-sm ${
+                      selectedDateFilter === "today"
+                        ? "bg-pink-500 text-white border-pink-500"
+                        : "bg-pink-50 text-gray-700 border-pink-400"
+                    }`}
+                  >
+                    Today: {formatShortDate(today)}
+                  </button>
 
-                <button
-                  onClick={() =>
-                    setSelectedDateFilter(
-                      selectedDateFilter === "tomorrow" ? "all" : "tomorrow"
-                    )
-                  }
-                  className={`px-3 py-2 border rounded-md text-sm ${
-                    selectedDateFilter === "tomorrow"
-                      ? "bg-pink-500 text-white border-pink-500"
-                      : "bg-pink-50 text-gray-700 border-pink-400"
-                  }`}
-                >
-                  Tomorrow: {formatShortDate(tomorrow)}
-                </button>
+                  <button
+                    onClick={() =>
+                      setSelectedDateFilter(
+                        selectedDateFilter === "tomorrow" ? "all" : "tomorrow"
+                      )
+                    }
+                    className={`px-3 py-2 border rounded-md text-sm ${
+                      selectedDateFilter === "tomorrow"
+                        ? "bg-pink-500 text-white border-pink-500"
+                        : "bg-pink-50 text-gray-700 border-pink-400"
+                    }`}
+                  >
+                    Tomorrow: {formatShortDate(tomorrow)}
+                  </button>
+                </div>
               </div>
             </div>
           )}

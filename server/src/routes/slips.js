@@ -59,7 +59,6 @@ router.get("/", async (req, res) => {
   try {
     // Use Mongoose's sort instead of Array.toSorted (toSorted may not exist in Node runtime)
     const slips = await Slip.find().sort({ createdAt: -1 });
-    console.log("slips", slips);
 
     res.json(slips);
   } catch (error) {

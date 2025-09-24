@@ -80,8 +80,6 @@ export default function UploadSlip() {
         }
       );
 
-      console.log("Upload result:", res.data);
-
       // Clear fields after successful upload
       setFile(null);
       setPreview(null);
@@ -117,7 +115,7 @@ export default function UploadSlip() {
                 <select
                   value={deliveryDay}
                   onChange={(e) => setDeliveryDay(e.target.value)}
-                  className="input w-24 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                  className="input w-24 border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
                   required
                   disabled={loading}
                 >
@@ -132,7 +130,7 @@ export default function UploadSlip() {
                 <select
                   value={deliveryMonth}
                   onChange={(e) => setDeliveryMonth(e.target.value)}
-                  className="input w-36 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                  className="input w-36 border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
                   required
                   disabled={loading}
                 >
@@ -163,7 +161,7 @@ export default function UploadSlip() {
                 <select
                   value={deliveryYear}
                   onChange={(e) => setDeliveryYear(e.target.value)}
-                  className="input w-28 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                  className="input w-28 border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
                   required
                   disabled={loading}
                 >
@@ -189,7 +187,7 @@ export default function UploadSlip() {
                 <select
                   value={deliveryHour}
                   onChange={(e) => setDeliveryHour(e.target.value)}
-                  className="input w-24 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                  className="input w-24 border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
                   required
                   disabled={loading}
                 >
@@ -204,7 +202,7 @@ export default function UploadSlip() {
                 <select
                   value={deliveryMinute}
                   onChange={(e) => setDeliveryMinute(e.target.value)}
-                  className="input w-28 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                  className="input w-28 border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
                   required
                   disabled={loading}
                 >
@@ -219,7 +217,7 @@ export default function UploadSlip() {
                 <select
                   value={deliveryPeriod}
                   onChange={(e) => setDeliveryPeriod(e.target.value)}
-                  className="input w-24 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                  className="input w-24 border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
                   required
                   disabled={loading}
                 >
@@ -237,7 +235,7 @@ export default function UploadSlip() {
               name="branch"
               value={branch}
               onChange={(e) => setBranch(e.target.value)}
-              className="input w-full border-pink-400 focus:ring-2 focus:ring-pink-500"
+              className="input w-full border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
               required
               disabled={loading}
             >
@@ -256,7 +254,7 @@ export default function UploadSlip() {
               name="deliveryType"
               value={deliveryType}
               onChange={(e) => setDeliveryType(e.target.value)}
-              className="input w-full border-pink-400 focus:ring-2 focus:ring-pink-500"
+              className="input w-full border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
               required
               disabled={loading}
             >
@@ -277,7 +275,7 @@ export default function UploadSlip() {
             <div className="flex items-center gap-3">
               <label
                 htmlFor="slip-file"
-                className="inline-flex items-center gap-2 px-3 py-2 bg-white border border-pink-500 rounded-md shadow-sm cursor-pointer hover:bg-gray-50"
+                className="flex  justify-center items-center gap-2 px-3 py-2 bg-white border border-pink-500 rounded-md shadow-sm cursor-pointer hover:bg-gray-50 w-72"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
