@@ -385,7 +385,7 @@ export default function SlipList() {
             </div>
 
             <div className="p-4">
-              <Image
+              <img
                 src={previewUrl}
                 alt={
                   previewSlip
