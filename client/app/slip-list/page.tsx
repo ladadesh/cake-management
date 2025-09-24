@@ -278,7 +278,7 @@ export default function SlipList() {
                 <li key={slip._id}>
                   <div className="w-full max-w-md bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition overflow-hidden">
                     <div className="relative p-4 bg-gray-50">
-                      <Image
+                      <img
                         src={
                           (slip.imageUrl && slip.imageUrl) || "/placeholder.png"
                         }
