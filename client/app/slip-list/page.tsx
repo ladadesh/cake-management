@@ -56,8 +56,8 @@ export default function SlipList() {
 
   // helper: produce local YYYY-MM-DD and HH:MM (local time) rather than using toISOString (UTC)
   const formatLocalIso = (d: Date) =>
-    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
-      d.getDate()
+    `${d.getDate()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+      d.getFullYear()
     ).padStart(2, "0")}`;
 
   // compute ISO-like local date strings to compare with slips stored dates (YYYY-MM-DD)
@@ -162,7 +162,7 @@ export default function SlipList() {
       )}
 
       {/* Top: sticky header / controls */}
-      <div className="flex-none sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b">
+      <div className=" bg-white/95 backdrop-blur-sm border-b">
         <div className="p-5 mx-5">
           <div className="flex items-center justify-between mb-4 sm:flex flex-col sm:items-start sm:gap-3">
             <h3 className="text-2xl font-semibold">Branches</h3>
