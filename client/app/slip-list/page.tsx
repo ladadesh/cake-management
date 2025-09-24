@@ -3,9 +3,19 @@ import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import Loader from "../components/Loader";
 import { branches } from "../constants/roles";
+import Image from "next/image";
 
-const page = () => {
-  const [slips, setSlips] = useState<any[]>([]);
+interface Slip {
+  _id: string;
+  branch?: string;
+  deliveryDate?: string;
+  deliveryTime?: string;
+  deliveryType?: string;
+  imageUrl?: string;
+}
+
+export default function SlipList() {
+  const [slips, setSlips] = useState<Slip[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
@@ -13,7 +23,7 @@ const page = () => {
     "all" | "today" | "tomorrow"
   >("all");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [previewSlip, setPreviewSlip] = useState<any | null>(null);
+  const [previewSlip, setPreviewSlip] = useState<Slip | null>(null);
 
   // compute today's and tomorrow's dates for display next to branch buttons
   const today = useMemo(() => new Date(), []);
@@ -50,12 +60,6 @@ const page = () => {
     `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
       d.getDate()
     ).padStart(2, "0")}`;
-
-  const formatLocalTime = (d: Date) =>
-    `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(
-      2,
-      "0"
-    )}`;
 
   // compute ISO-like local date strings to compare with slips stored dates (YYYY-MM-DD)
   const todayIso = useMemo(() => {
@@ -96,9 +100,10 @@ const page = () => {
     }
   };
 
-  const openPreview = (url: string, slip: any) => {
+  const openPreview = (url?: string | null, slip?: Slip | null) => {
+    if (!url) return; // don't open preview without a valid URL
     setPreviewUrl(url);
-    setPreviewSlip(slip);
+    setPreviewSlip(slip ?? null);
   };
 
   const closePreview = () => {
@@ -273,8 +278,10 @@ const page = () => {
                 <li key={slip._id}>
                   <div className="w-full max-w-md bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition overflow-hidden">
                     <div className="relative p-4 bg-gray-50">
-                      <img
-                        src={slip.imageUrl}
+                      <Image
+                        src={
+                          (slip.imageUrl && slip.imageUrl) || "/placeholder.png"
+                        }
                         alt={`Slip for ${slip.branch}`}
                         className="w-full h-64 object-contain rounded-md border"
                       />
@@ -378,7 +385,7 @@ const page = () => {
             </div>
 
             <div className="p-4">
-              <img
+              <Image
                 src={previewUrl}
                 alt={
                   previewSlip
@@ -393,6 +400,4 @@ const page = () => {
       )}
     </div>
   );
-};
-
-export default page;
+}

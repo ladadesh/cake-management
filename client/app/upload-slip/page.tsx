@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import Loader from "../components/Loader";
 import { branches } from "../constants/roles";
+import Image from "next/image";
 
 export default function UploadSlip() {
-  const [deliveryDate, setDeliveryDate] = useState("");
   const [deliveryDay, setDeliveryDay] = useState("");
   const [deliveryMonth, setDeliveryMonth] = useState("");
   const [deliveryYear, setDeliveryYear] = useState("");
@@ -72,7 +72,7 @@ export default function UploadSlip() {
 
     setLoading(true);
     try {
-      const res = await axios.post(
+      await axios.post(
         "https://cake-management.vercel.app/api/slips",
         formData,
         {
@@ -83,7 +83,6 @@ export default function UploadSlip() {
       // Clear fields after successful upload
       setFile(null);
       setPreview(null);
-      setDeliveryDate("");
       setDeliveryDay("");
       setDeliveryMonth("");
       setDeliveryYear("");
@@ -328,7 +327,7 @@ export default function UploadSlip() {
           {preview && (
             <div className="mt-2">
               <label className="block font-semibold mb-1">Preview</label>
-              <img
+              <Image
                 src={preview}
                 alt="slip preview"
                 className="max-h-64 rounded-md shadow-sm"
