@@ -10,7 +10,10 @@ export default function UploadSlip() {
   const [deliveryDay, setDeliveryDay] = useState("");
   const [deliveryMonth, setDeliveryMonth] = useState("");
   const [deliveryYear, setDeliveryYear] = useState("");
-  const [deliveryTime, setDeliveryTime] = useState("");
+  // replaced single time string with separate selects for hour/minute/period
+  const [deliveryHour, setDeliveryHour] = useState("");
+  const [deliveryMinute, setDeliveryMinute] = useState("");
+  const [deliveryPeriod, setDeliveryPeriod] = useState("");
   const [branch, setBranch] = useState("");
   const [deliveryType, setDeliveryType] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -46,15 +49,24 @@ export default function UploadSlip() {
       return;
     }
 
+    // Validate time selects and convert to 24-hour HH:MM
+    if (!deliveryHour || !deliveryMinute || !deliveryPeriod) {
+      alert("Please provide delivery time (hour, minute and AM/PM).");
+      setLoading(false);
+      return;
+    }
+
+    const timeStr = `${deliveryHour}:${deliveryMinute} ${deliveryPeriod}`; // keep original for display
+
     // Pad day/month to 2 digits
     const dd = deliveryDay.padStart(2, "0");
     const mm = deliveryMonth.padStart(2, "0");
-    const isoDate = `${deliveryYear}-${mm}-${dd}`;
+    const isoDate = `${dd}-${mm}-${deliveryYear}`;
 
     const formData = new FormData();
     formData.append("slip", file);
     formData.append("deliveryDate", isoDate);
-    formData.append("deliveryTime", deliveryTime);
+    formData.append("deliveryTime", timeStr);
     formData.append("deliveryType", deliveryType);
     formData.append("branch", branch);
 
@@ -77,7 +89,9 @@ export default function UploadSlip() {
       setDeliveryDay("");
       setDeliveryMonth("");
       setDeliveryYear("");
-      setDeliveryTime("");
+      setDeliveryHour("");
+      setDeliveryMinute("");
+      setDeliveryPeriod("");
       setDeliveryType("");
       setBranch("");
     } catch (error) {
@@ -103,7 +117,7 @@ export default function UploadSlip() {
                 <select
                   value={deliveryDay}
                   onChange={(e) => setDeliveryDay(e.target.value)}
-                  className="input w-24"
+                  className="input w-24 border-pink-400 focus:ring-2 focus:ring-pink-500"
                   required
                   disabled={loading}
                 >
@@ -118,7 +132,7 @@ export default function UploadSlip() {
                 <select
                   value={deliveryMonth}
                   onChange={(e) => setDeliveryMonth(e.target.value)}
-                  className="input w-36"
+                  className="input w-36 border-pink-400 focus:ring-2 focus:ring-pink-500"
                   required
                   disabled={loading}
                 >
@@ -149,7 +163,7 @@ export default function UploadSlip() {
                 <select
                   value={deliveryYear}
                   onChange={(e) => setDeliveryYear(e.target.value)}
-                  className="input w-28"
+                  className="input w-28 border-pink-400 focus:ring-2 focus:ring-pink-500"
                   required
                   disabled={loading}
                 >
@@ -171,15 +185,49 @@ export default function UploadSlip() {
 
             <div>
               <label className="block font-semibold mb-1">Time</label>
-              <input
-                type="time"
-                name="deliveryTime"
-                value={deliveryTime}
-                onChange={(e) => setDeliveryTime(e.target.value)}
-                className="input w-full"
-                required
-                disabled={loading}
-              />
+              <div className="flex items-center gap-2">
+                <select
+                  value={deliveryHour}
+                  onChange={(e) => setDeliveryHour(e.target.value)}
+                  className="input w-24 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                  required
+                  disabled={loading}
+                >
+                  <option value="">Hour</option>
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
+                    <option key={h} value={String(h)}>
+                      {h}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={deliveryMinute}
+                  onChange={(e) => setDeliveryMinute(e.target.value)}
+                  className="input w-28 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                  required
+                  disabled={loading}
+                >
+                  <option value="">Minutes</option>
+                  {["15", "30", "45"].map((m) => (
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={deliveryPeriod}
+                  onChange={(e) => setDeliveryPeriod(e.target.value)}
+                  className="input w-24 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                  required
+                  disabled={loading}
+                >
+                  <option value="">AM/PM</option>
+                  <option value="AM">AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -189,7 +237,7 @@ export default function UploadSlip() {
               name="branch"
               value={branch}
               onChange={(e) => setBranch(e.target.value)}
-              className="input w-full"
+              className="input w-full border-pink-400 focus:ring-2 focus:ring-pink-500"
               required
               disabled={loading}
             >
@@ -208,7 +256,7 @@ export default function UploadSlip() {
               name="deliveryType"
               value={deliveryType}
               onChange={(e) => setDeliveryType(e.target.value)}
-              className="input w-full"
+              className="input w-full border-pink-400 focus:ring-2 focus:ring-pink-500"
               required
               disabled={loading}
             >

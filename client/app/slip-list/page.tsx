@@ -2,13 +2,71 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import Loader from "../components/Loader";
+import { branches } from "../constants/roles";
 
 const page = () => {
   const [slips, setSlips] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
+  const [selectedDateFilter, setSelectedDateFilter] = useState<
+    "all" | "today" | "tomorrow"
+  >("all");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewSlip, setPreviewSlip] = useState<any | null>(null);
+
+  // compute today's and tomorrow's dates for display next to branch buttons
+  const today = useMemo(() => new Date(), []);
+  const tomorrow = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    return d;
+  }, []);
+
+  // use a deterministic formatter (UTC-based) so server and client render the same string
+  const formatShortDate = (d: Date) => {
+    // map month index to short month names (English) to avoid locale differences
+    const shortMonths = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const day = d.getDate();
+    const month = shortMonths[d.getMonth()];
+    return `${day} ${month}`;
+  };
+
+  // helper: produce local YYYY-MM-DD and HH:MM (local time) rather than using toISOString (UTC)
+  const formatLocalIso = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+      d.getDate()
+    ).padStart(2, "0")}`;
+
+  const formatLocalTime = (d: Date) =>
+    `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(
+      2,
+      "0"
+    )}`;
+
+  // compute ISO-like local date strings to compare with slips stored dates (YYYY-MM-DD)
+  const todayIso = useMemo(() => {
+    const d = new Date(today);
+    return formatLocalIso(d);
+  }, [today]);
+
+  const tomorrowIso = useMemo(() => {
+    const d = new Date(tomorrow);
+    return formatLocalIso(d);
+  }, [tomorrow]);
 
   useEffect(() => {
     fetchSlips();
@@ -47,9 +105,27 @@ const page = () => {
   };
 
   const filteredSlips = useMemo(() => {
-    if (!search.trim()) return slips;
-    const q = search.toLowerCase();
+    const q = search.trim().toLowerCase();
+
     return slips.filter((s) => {
+      // branch filter
+      if (selectedBranch && selectedBranch !== "all") {
+        if (String(s.branch || "").toLowerCase() !== selectedBranch) {
+          return false;
+        }
+      }
+
+      // date filter: if selected, compare slip.deliveryDate (stored as YYYY-MM-DD)
+      if (selectedDateFilter === "today") {
+        if (String(s.deliveryDate || "").slice(0, 10) !== todayIso)
+          return false;
+      } else if (selectedDateFilter === "tomorrow") {
+        if (String(s.deliveryDate || "").slice(0, 10) !== tomorrowIso)
+          return false;
+      }
+
+      if (!q) return true;
+
       return (
         String(s.branch || "")
           .toLowerCase()
@@ -62,73 +138,196 @@ const page = () => {
           .includes(q)
       );
     });
-  }, [search, slips]);
+  }, [
+    search,
+    slips,
+    selectedBranch,
+    selectedDateFilter,
+    todayIso,
+    tomorrowIso,
+  ]);
 
   return (
-    <div className="mt-8 relative mx-5">
+    <div className="h-screen flex flex-col">
       {loading && <Loader />}
 
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-2xl font-semibold">Uploaded Slips</h3>
-        <div className="flex items-center gap-2">
-          <input
-            aria-label="Search slips"
-            className="px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            placeholder="Search by branch, type or date..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+      {/* Top: sticky header / controls */}
+      <div className="flex-none sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b">
+        <div className="p-5 mx-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-2xl font-semibold">Branches</h3>
+          </div>
+
+          {branches?.length > 0 && (
+            <div className="mb-6 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex-1 flex flex-wrap gap-3">
+                  <button
+                    onClick={() => setSelectedBranch("all")}
+                    className={`px-4 py-2 rounded-full text-sm border ${
+                      !selectedBranch || selectedBranch === "all"
+                        ? "bg-pink-500 text-white border-pink-500"
+                        : "bg-pink-50 text-gray-800 border-pink-400"
+                    }`}
+                  >
+                    All
+                  </button>
+
+                  {branches.map((b) => {
+                    const key = String(b.id || b.name).toLowerCase();
+                    const isActive = selectedBranch === key;
+                    return (
+                      <button
+                        key={b.id}
+                        onClick={() => setSelectedBranch(key)}
+                        aria-pressed={isActive}
+                        className={`px-4 py-2 rounded-full text-sm border ${
+                          isActive
+                            ? "bg-pink-500 text-white border-pink-500"
+                            : "bg-pink-50 text-gray-800 border-pink-400"
+                        }`}
+                      >
+                        {b.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="w-72">
+                <input
+                  aria-label="Search slips"
+                  className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                  placeholder="Search by branch, type or date..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+
+              <div className="ml-4 flex-shrink-0 flex items-center gap-2">
+                <button
+                  onClick={() => setSelectedDateFilter("all")}
+                  className={`px-3 py-2 border rounded-md text-sm ${
+                    selectedDateFilter === "all"
+                      ? "bg-pink-500 text-white border-pink-500"
+                      : "bg-pink-50 text-gray-700 border-pink-400"
+                  }`}
+                >
+                  All
+                </button>
+
+                <button
+                  onClick={() =>
+                    setSelectedDateFilter(
+                      selectedDateFilter === "today" ? "all" : "today"
+                    )
+                  }
+                  className={`px-3 py-2 border rounded-md text-sm ${
+                    selectedDateFilter === "today"
+                      ? "bg-pink-500 text-white border-pink-500"
+                      : "bg-pink-50 text-gray-700 border-pink-400"
+                  }`}
+                >
+                  Today: {formatShortDate(today)}
+                </button>
+
+                <button
+                  onClick={() =>
+                    setSelectedDateFilter(
+                      selectedDateFilter === "tomorrow" ? "all" : "tomorrow"
+                    )
+                  }
+                  className={`px-3 py-2 border rounded-md text-sm ${
+                    selectedDateFilter === "tomorrow"
+                      ? "bg-pink-500 text-white border-pink-500"
+                      : "bg-pink-50 text-gray-700 border-pink-400"
+                  }`}
+                >
+                  Tomorrow: {formatShortDate(tomorrow)}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {filteredSlips.length === 0 ? (
-        <p className="text-gray-500">No slips found.</p>
-      ) : (
-        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredSlips.map((slip) => (
-            <li key={slip._id}>
-              <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition overflow-hidden">
-                <div className="relative p-4 bg-gray-50">
-                  <img
-                    src={slip.imageUrl}
-                    alt={`Slip for ${slip.branch}`}
-                    className="w-full h-48 object-contain rounded-md border"
-                  />
-                </div>
+      {/* Scrollable content area: only this scrolls */}
+      <main className="flex-1 overflow-auto p-5">
+        <div className="mx-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-2xl font-semibold">Uploaded Slips</h3>
+          </div>
 
-                <div className="p-4">
-                  <h4 className="text-md font-semibold mb-1">
-                    {slip.branch || "Branch"}
-                  </h4>
-                  <p className="text-sm text-gray-500 mb-2">
-                    {slip.deliveryType || "Delivery"} •{" "}
-                    {slip.deliveryDate || "-"}
-                  </p>
+          {filteredSlips.length === 0 ? (
+            <p className="text-gray-500">No slips found.</p>
+          ) : (
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredSlips.map((slip) => (
+                <li key={slip._id}>
+                  <div className="w-full max-w-md bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition overflow-hidden">
+                    <div className="relative p-4 bg-gray-50">
+                      <img
+                        src={slip.imageUrl}
+                        alt={`Slip for ${slip.branch}`}
+                        className="w-full h-64 object-contain rounded-md border"
+                      />
+                    </div>
 
-                  <div className="flex items-center justify-between"></div>
+                    <div className="p-6">
+                      <h4 className="text-xl font-semibold mb-2">
+                        {slip.branch?.toUpperCase() || "Branch"}
+                      </h4>
 
-                  <div className="mt-3 flex items-center justify-between gap-2">
-                    <button
-                      onClick={() => openPreview(slip.imageUrl, slip)}
-                      className="inline-flex items-center px-3 py-2 bg-pink-500 hover:bg-pink-700 text-white text-sm rounded-md"
-                    >
-                      View
-                    </button>
-                    <a
-                      href={slip.imageUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-sm text-gray-500 underline"
-                    >
-                      Open image
-                    </a>
+                      <div className="flex items-center gap-3 mb-3">
+                        <span className="text-sm font-medium text-gray-600 text-transform: uppercase">
+                          {slip.deliveryType || "Delivery"}
+                        </span>
+                        <span className="text-gray-300">•</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-base font-medium text-gray-700">
+                            {slip.deliveryDate}
+                          </span>
+                          <span className="text-sm text-gray-500 bg-pink-50 px-2 py-1 rounded">
+                            {slip.deliveryTime}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between mt-4 gap-2">
+                        <button
+                          onClick={() => openPreview(slip.imageUrl, slip)}
+                          className="inline-flex items-center px-4 py-2 bg-pink-500 hover:bg-pink-700 text-white text-base rounded-md cursor-pointer"
+                        >
+                          View
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            className="ml-2 bi bi-eye"
+                            viewBox="0 0 16 16"
+                          >
+                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
+                            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
+                          </svg>
+                        </button>
+                        <a
+                          href={slip.imageUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-sm text-gray-500 underline"
+                        >
+                          Open image
+                        </a>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </main>
 
       {/* Preview Modal */}
       {previewUrl && (
