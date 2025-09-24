@@ -162,16 +162,12 @@ export default function SlipList() {
       )}
 
       {/* Top: sticky header / controls */}
-      <div className=" bg-white/95 backdrop-blur-sm border-b">
-        <div className="p-5 mx-5">
-          <div className="flex items-center justify-between mb-4 sm:flex flex-col sm:items-start sm:gap-3">
-            <h3 className="text-2xl font-semibold">Branches</h3>
-          </div>
-
+      <div className="bg-white/95 backdrop-blur-sm border-b">
+        <div className="p-3 mx-5">
           {branches?.length > 0 && (
-            <div className="mb-6 flex items-center justify-between gap-3">
+            <div className="mb-2 flex items-center justify-between gap-3 flex-col md:flex-row sm:flex-row">
               <div className="flex items-center gap-3">
-                <div className="flex-1 flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-3">
                   <button
                     onClick={() => setSelectedBranch("all")}
                     className={`px-4 py-2 rounded-full text-sm border ${
@@ -204,7 +200,7 @@ export default function SlipList() {
                 </div>
               </div>
 
-              <div className="w-72">
+              <div className="w-72 sm:my-2">
                 <input
                   aria-label="Search slips"
                   className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
