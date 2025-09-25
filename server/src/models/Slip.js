@@ -11,6 +11,7 @@ const slipSchema = new mongoose.Schema({
   cakeType: { type: String, required: true },
   customerNumber: { type: String, required: true },
   billNumber: { type: String, required: false },
+  hamper: { type: Boolean, required: true },
 });
 
 export default mongoose.model("Slip", slipSchema);

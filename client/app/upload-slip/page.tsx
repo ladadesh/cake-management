@@ -22,6 +22,7 @@ export default function UploadSlip() {
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [billNumber, setBillNumber] = useState("");
+  const [hamper, setHamper] = useState("");
 
   const deliveryTypes = [
     { id: "delivery", name: "Delivery" },
@@ -97,6 +98,7 @@ export default function UploadSlip() {
       formData.append("deliveryTime", timeStr);
       formData.append("deliveryType", deliveryType);
       formData.append("branch", branch);
+      formData.append("hamper", hamper);
 
       setLoading(true);
       try {
@@ -123,6 +125,7 @@ export default function UploadSlip() {
         setCustomerName("");
         setCustomerPhone("");
         setCakeType("");
+        setHamper("");
       } catch (error) {
         console.error("Upload request error:", error);
         // For now we just log. Could set an error state to show to the user.
@@ -342,6 +345,35 @@ export default function UploadSlip() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block font-semibold mb-1">Hamper</label>
+              <div className="flex gap-4 mt-3">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="hamper"
+                    value="yes"
+                    checked={hamper === "yes"}
+                    onChange={(e) => setHamper(e.target.value)}
+                    className="h-4 w-4 accent-pink-600 border-gray-300 focus:ring-pink-500 "
+                    disabled={loading}
+                  />
+                  Yes
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="hamper"
+                    value="no"
+                    checked={hamper === "no" || hamper === ""}
+                    onChange={(e) => setHamper(e.target.value)}
+                    className="h-4 w-4 accent-pink-600 border-gray-300 focus:ring-pink-500 "
+                    disabled={loading}
+                  />
+                  No
+                </label>
+              </div>
+            </div>
             <div>
               <label className="block font-semibold mb-1">
                 Upload Slip (image)
