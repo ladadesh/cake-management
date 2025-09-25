@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import axios from "axios";
 import Loader from "../components/Loader";
 import { branches } from "../constants/roles";
-import Image from "next/image";
 
 export default function UploadSlip() {
   const [deliveryDay, setDeliveryDay] = useState("");
@@ -15,14 +14,25 @@ export default function UploadSlip() {
   const [deliveryMinute, setDeliveryMinute] = useState("");
   const [deliveryPeriod, setDeliveryPeriod] = useState("");
   const [branch, setBranch] = useState("");
+  const [cakeType, setCakeType] = useState("");
   const [deliveryType, setDeliveryType] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [billNumber, setBillNumber] = useState("");
 
   const deliveryTypes = [
     { id: "delivery", name: "Delivery" },
     { id: "pickup", name: "Pick Up" },
+  ];
+
+  const cakeTypes = [
+    { id: "cream", name: "Cream" },
+    { id: "fondant", name: "Fondant" },
+    { id: "semi-fondant", name: "Semi Fondant" },
+    { id: "other", name: "Other" },
   ];
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,6 +52,18 @@ export default function UploadSlip() {
 
     if (!file) return;
 
+    if (!customerName.trim()) {
+      alert("Please provide the customer name.");
+      setLoading(false);
+      return;
+    }
+
+    if (!customerPhone.trim()) {
+      alert("Please provide the customer phone number.");
+      setLoading(false);
+      return;
+    }
+
     // Validate separate date fields and combine into ISO string
     if (!deliveryDay || !deliveryMonth || !deliveryYear) {
       alert("Please provide day, month and year for delivery date.");
@@ -52,50 +74,61 @@ export default function UploadSlip() {
     // Validate time selects and convert to 24-hour HH:MM
     if (!deliveryHour || !deliveryMinute || !deliveryPeriod) {
       alert("Please provide delivery time (hour, minute and AM/PM).");
-      setLoading(false);
-      return;
-    }
+      if (!deliveryHour || !deliveryPeriod) {
+        alert("Please provide delivery time (hour and AM/PM).");
+        setLoading(false);
+        return;
+      }
 
-    const timeStr = `${deliveryHour}:${deliveryMinute} ${deliveryPeriod}`; // keep original for display
+      const timeStr = `${deliveryHour} ${deliveryPeriod}`; // keep original for display
 
-    // Pad day/month to 2 digits
-    const dd = deliveryDay.padStart(2, "0");
-    const mm = deliveryMonth.padStart(2, "0");
-    const isoDate = `${dd}-${mm}-${deliveryYear}`;
+      // Pad day/month to 2 digits
+      const dd = deliveryDay.padStart(2, "0");
+      const mm = deliveryMonth.padStart(2, "0");
+      const isoDate = `${dd}-${mm}`;
 
-    const formData = new FormData();
-    formData.append("slip", file);
-    formData.append("deliveryDate", isoDate);
-    formData.append("deliveryTime", timeStr);
-    formData.append("deliveryType", deliveryType);
-    formData.append("branch", branch);
+      const formData = new FormData();
+      formData.append("slip", file);
+      formData.append("deliveryDate", isoDate);
+      formData.append("customerName", customerName);
+      formData.append("customerPhone", customerPhone);
+      formData.append("cakeType", cakeType);
+      formData.append("billNumber", billNumber);
+      formData.append("deliveryTime", timeStr);
+      formData.append("deliveryType", deliveryType);
+      formData.append("branch", branch);
 
-    setLoading(true);
-    try {
-      await axios.post(
-        "https://cake-management.vercel.app/api/slips",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      setLoading(true);
+      try {
+        await axios.post(
+          "https://cake-management.vercel.app/api/slips",
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
 
-      // Clear fields after successful upload
-      setFile(null);
-      setPreview(null);
-      setDeliveryDay("");
-      setDeliveryMonth("");
-      setDeliveryYear("");
-      setDeliveryHour("");
-      setDeliveryMinute("");
-      setDeliveryPeriod("");
-      setDeliveryType("");
-      setBranch("");
-    } catch (error) {
-      console.error("Upload request error:", error);
-      // For now we just log. Could set an error state to show to the user.
-    } finally {
-      setLoading(false);
+        // Clear fields after successful upload
+        setFile(null);
+        setPreview(null);
+        setDeliveryDay("");
+        setDeliveryMonth("");
+        setDeliveryYear("");
+        setDeliveryHour("");
+        setDeliveryMinute("");
+        setDeliveryPeriod("");
+        setDeliveryType("");
+        setBranch("");
+        setBillNumber("");
+        setCustomerName("");
+        setCustomerPhone("");
+        setCakeType("");
+      } catch (error) {
+        console.error("Upload request error:", error);
+        // For now we just log. Could set an error state to show to the user.
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -107,6 +140,42 @@ export default function UploadSlip() {
         </h2>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label
+                htmlFor="customerName"
+                className="block font-semibold mb-1"
+              >
+                Customer Name
+              </label>
+              <input
+                type="text"
+                id="customerName"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                className="input w-full border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                required
+                disabled={loading}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="customerPhone"
+                className="block font-semibold mb-1"
+              >
+                Customer Phone No.
+              </label>
+              <input
+                type="tel"
+                id="customerPhone"
+                value={customerPhone}
+                onChange={(e) => setCustomerPhone(e.target.value)}
+                className="input w-full border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                required
+                disabled={loading}
+              />
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block font-semibold mb-1">Date</label>
@@ -156,27 +225,6 @@ export default function UploadSlip() {
                     );
                   })}
                 </select>
-
-                <select
-                  value={deliveryYear}
-                  onChange={(e) => setDeliveryYear(e.target.value)}
-                  className="input w-28 border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  required
-                  disabled={loading}
-                >
-                  <option value="">Year</option>
-                  {(() => {
-                    const current = new Date().getFullYear();
-                    const years = [] as number[];
-                    for (let y = current - 3; y <= current + 3; y++)
-                      years.push(y);
-                    return years.map((y) => (
-                      <option key={y} value={String(y)}>
-                        {y}
-                      </option>
-                    ));
-                  })()}
-                </select>
               </div>
             </div>
 
@@ -199,21 +247,6 @@ export default function UploadSlip() {
                 </select>
 
                 <select
-                  value={deliveryMinute}
-                  onChange={(e) => setDeliveryMinute(e.target.value)}
-                  className="input w-28 border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  required
-                  disabled={loading}
-                >
-                  <option value="">Minutes</option>
-                  {["15", "30", "45"].map((m) => (
-                    <option key={m} value={m}>
-                      {m}
-                    </option>
-                  ))}
-                </select>
-
-                <select
                   value={deliveryPeriod}
                   onChange={(e) => setDeliveryPeriod(e.target.value)}
                   className="input w-24 border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
@@ -228,106 +261,150 @@ export default function UploadSlip() {
             </div>
           </div>
 
-          <div>
-            <label className="block font-semibold mb-1">Branch</label>
-            <select
-              name="branch"
-              value={branch}
-              onChange={(e) => setBranch(e.target.value)}
-              className="input w-full border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
-              required
-              disabled={loading}
-            >
-              <option value="">Select branch</option>
-              {branches.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block font-semibold mb-1">Delivery Type</label>
-            <select
-              name="deliveryType"
-              value={deliveryType}
-              onChange={(e) => setDeliveryType(e.target.value)}
-              className="input w-full border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
-              required
-              disabled={loading}
-            >
-              <option value="">Select delivery type</option>
-              {deliveryTypes.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block font-semibold mb-1">
-              Upload Slip (image)
-            </label>
-
-            <div className="flex items-center gap-3">
-              <label
-                htmlFor="slip-file"
-                className="flex  justify-center items-center gap-2 px-3 py-2 bg-white border border-pink-500 rounded-md shadow-sm cursor-pointer hover:bg-gray-50 w-72"
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block font-semibold mb-1">Branch</label>
+              <select
+                name="branch"
+                value={branch}
+                onChange={(e) => setBranch(e.target.value)}
+                className="input w-full border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                required
+                disabled={loading}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-pink-500"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden
-                >
-                  <path d="M3 14a1 1 0 011-1h12a1 1 0 011 1v1a2 2 0 01-2 2H4a2 2 0 01-2-2v-1z" />
-                  <path d="M7 8l3-3 3 3V1h2v9H5V1h2v7z" />
-                </svg>
-                <span className="text-sm text-gray-700">Choose image</span>
-              </label>
+                <option value="">Select branch</option>
+                {branches.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
+            <div>
+              <label className="block font-semibold mb-1">Cake Types</label>
+              <select
+                name="cakeType"
+                value={cakeType}
+                onChange={(e) => setCakeType(e.target.value)}
+                className="input w-full border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                required
+                disabled={loading}
+              >
+                <option value="">Select Cake Type</option>
+                {cakeTypes.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block font-semibold mb-1">
+                Pickup / Delivery
+              </label>
+              <select
+                name="deliveryType"
+                value={deliveryType}
+                onChange={(e) => setDeliveryType(e.target.value)}
+                className="input w-full border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                required
+                disabled={loading}
+              >
+                <option value="">Select delivery type</option>
+                {deliveryTypes.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label
+                htmlFor="customerName"
+                className="block font-semibold mb-1"
+              >
+                Bill Number
+              </label>
               <input
-                id="slip-file"
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="sr-only"
+                type="text"
+                id="billNumber"
+                value={billNumber}
+                onChange={(e) => setBillNumber(e.target.value)}
+                className="input w-full border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500"
                 required
                 disabled={loading}
               />
+            </div>
+          </div>
 
-              {file ? (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">{file.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFile(null);
-                      setPreview(null);
-                      // reset the underlying input value by selecting it and clearing
-                      const inp = document.getElementById(
-                        "slip-file"
-                      ) as HTMLInputElement | null;
-                      if (inp) inp.value = "";
-                    }}
-                    className="text-xs text-red-500 hover:underline"
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block font-semibold mb-1">
+                Upload Slip (image)
+              </label>
+
+              <div className="flex items-center gap-3">
+                <label
+                  htmlFor="slip-file"
+                  className="flex  justify-center items-center gap-2 px-3 py-2 bg-white border border-pink-500 rounded-md shadow-sm cursor-pointer hover:bg-gray-50"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 text-pink-500"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden
                   >
-                    Remove
-                  </button>
-                </div>
-              ) : (
-                <span className="text-sm text-gray-400">No file chosen</span>
-              )}
+                    <path d="M3 14a1 1 0 011-1h12a1 1 0 011 1v1a2 2 0 01-2 2H4a2 2 0 01-2-2v-1z" />
+                    <path d="M7 8l3-3 3 3V1h2v9H5V1h2v7z" />
+                  </svg>
+                  <span className="text-sm text-gray-700">Choose image</span>
+                </label>
+
+                <input
+                  id="slip-file"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="sr-only"
+                  required
+                  disabled={loading}
+                />
+
+                {file ? (
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFile(null);
+                        setPreview(null);
+                        // reset the underlying input value by selecting it and clearing
+                        const inp = document.getElementById(
+                          "slip-file"
+                        ) as HTMLInputElement | null;
+                        if (inp) inp.value = "";
+                      }}
+                      className="text-xs text-red-500 hover:underline"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <span className="text-sm text-gray-400">No file chosen</span>
+                )}
+              </div>
             </div>
           </div>
 
           {preview && (
-            <div className="mt-2">
+            <div className="mt-1">
+              <span className="text-sm text-gray-600">{file && file.name}</span>
               <label className="block font-semibold mb-1">Preview</label>
-              <Image
+              <img
                 src={preview}
                 alt="slip preview"
                 className="max-h-64 rounded-md shadow-sm"

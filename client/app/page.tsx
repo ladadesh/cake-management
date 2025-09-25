@@ -1,8 +1,38 @@
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
 import Link from "next/link";
-// import { useState } from "react";
+import axios from "axios";
 
 export default function HomePage() {
+  useEffect(() => {
+    const deleteOldSlips = async () => {
+      const lastCalled = localStorage.getItem("lastCalled");
+      const today = new Date().toLocaleDateString();
+
+      if (lastCalled !== today) {
+        try {
+          const response = await axios.delete(
+            "http://localhost:4001/api/slips/old"
+          );
+
+          if (response.status === 200) {
+            console.log("Successfully deleted old slips.");
+            localStorage.setItem("lastCalled", today);
+          } else {
+            console.error("Failed to delete old slips.");
+          }
+        } catch (error) {
+          console.error("Error calling delete API:", error);
+        }
+      } else {
+        console.log("Delete API already called today.");
+      }
+    };
+
+    deleteOldSlips(); // Call the function when the component mounts
+  }, []);
+
   return (
     <main className="min-h-screen bg-pink-50 py-10 px-4">
       <section className="flex flex-col items-center text-center p-8">
