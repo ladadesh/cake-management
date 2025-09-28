@@ -82,40 +82,69 @@ router.get("/", async (req, res) => {
   }
 });
 
-//DELETE slips older than 15 days
+//DELETE slips older than 5 days
 router.delete("/old", async (req, res) => {
   try {
-    const days = parseInt(req.params.days, 10) || 15;
+    const days = 5; // Slips with a delivery date 5 or more days ago will be deleted.
     const cutoff = new Date();
+    // Set to the beginning of today to include all of today in the "not old" range.
+    cutoff.setHours(0, 0, 0, 0);
     cutoff.setDate(cutoff.getDate() - days);
+    console.log("Cutoff date:", cutoff);
 
-    // find slips to delete and their Cloudinary public_ids (if any)
-    const slipsToDelete = await Slip.find(
-      { createdAt: { $lt: cutoff } },
-      "public_id"
-    );
+    // Find slips to delete using an aggregation pipeline to convert deliveryDate string to a Date object
+    const slipsToDelete = await Slip.aggregate([
+      {
+        $addFields: {
+          deliveryDateObj: {
+            $dateFromString: {
+              dateString: "$deliveryDate",
+              format: "%d-%m-%Y",
+              onError: null, // Return null on parsing error
+            },
+          },
+        },
+      },
+      { $match: { deliveryDateObj: { $lt: cutoff } } },
+      { $project: { public_id: 1 } }, // Only need the public_id for Cloudinary deletion
+      {
+        $match: { deliveryDateObj: { $ne: null, $lt: cutoff } },
+      }, // Filter out nulls and match dates older than cutoff
+      { $project: { public_id: 1 } }, // Only need the public_id for Cloudinary deletion and _id for DB deletion
+    ]);
+    console.log("Slips to delete:", slipsToDelete);
 
-    // remove images from Cloudinary where public_id exists
+    const idsToDelete = slipsToDelete.map((s) => s._id);
+
+    // If no slips to delete, exit early.
+    if (idsToDelete.length === 0) {
+      return res.json({
+        success: true,
+        message: "No old slips to delete.",
+        deletedCount: 0,
+      });
+    }
+
+    // Remove images from Cloudinary where public_id exists
+    const cloudinaryPublicIds = slipsToDelete
+      .map((s) => s.public_id)
+      .filter(Boolean);
+
     await Promise.all(
-      slipsToDelete.map(async (s) => {
-        if (s.public_id) {
-          try {
-            await cloudinary.uploader.destroy(s.public_id, {
-              resource_type: "image",
-            });
-          } catch (err) {
-            console.error(
-              `Failed to remove Cloudinary image ${s.public_id}:`,
-              err
-            );
-            // continue deleting DB records even if Cloudinary removal fails
-          }
+      cloudinaryPublicIds.map(async (publicId) => {
+        try {
+          await cloudinary.uploader.destroy(publicId, {
+            resource_type: "image",
+          });
+        } catch (err) {
+          console.error(`Failed to remove Cloudinary image ${publicId}:`, err);
+          // Continue deleting DB records even if Cloudinary removal fails
         }
       })
     );
 
     // delete DB records
-    const result = await Slip.deleteMany({ createdAt: { $lt: cutoff } });
+    const result = await Slip.deleteMany({ _id: { $in: idsToDelete } });
 
     res.json({
       success: true,
