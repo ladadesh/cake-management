@@ -20,3 +20,15 @@ export const branches = [
   { id: "dharampeth", name: "Dharampeth" },
   { id: "kapilNagar", name: "Kapil Nagar" },
 ];
+
+export const deliveryTypes = [
+  { id: "delivery", name: "Delivery" },
+  { id: "pickup", name: "Pick Up" },
+];
+
+export const cakeTypes = [
+  { id: "cream", name: "Cream" },
+  { id: "fondant", name: "Fondant" },
+  { id: "semi-fondant", name: "Semi Fondant" },
+  { id: "other", name: "Other" },
+];

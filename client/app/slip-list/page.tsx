@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import Loader from "../components/Loader";
-import { branches } from "../constants/roles";
+import { branches, cakeTypes, deliveryTypes } from "../constants/roles";
 
 interface Slip {
   _id: string;
@@ -11,6 +11,10 @@ interface Slip {
   deliveryTime?: string;
   deliveryType?: string;
   imageUrl?: string;
+  customerName?: string;
+  customerNumber?: string;
+  billNumber?: string;
+  cakeType?: string;
 }
 
 export default function SlipList() {
@@ -18,6 +22,10 @@ export default function SlipList() {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
+  const [selectedDeliveryType, setSelectedDeliveryType] = useState<
+    string | null
+  >(null);
+  const [selectedCakeType, setSelectedCakeType] = useState<string | null>(null);
   const [selectedDateFilter, setSelectedDateFilter] = useState<
     "all" | "today" | "tomorrow"
   >("all");
@@ -88,9 +96,7 @@ export default function SlipList() {
   const fetchSlips = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(
-        "https://cake-management.vercel.app/api/slips"
-      );
+      const res = await axios.get("http://localhost:4001/api/slips");
       setSlips(res.data || []);
     } catch (err) {
       console.error("Failed to fetch slips", err);
@@ -121,6 +127,22 @@ export default function SlipList() {
         }
       }
 
+      // delivery type filter
+      if (selectedDeliveryType && selectedDeliveryType !== "all") {
+        if (
+          String(s.deliveryType || "").toLowerCase() !== selectedDeliveryType
+        ) {
+          return false;
+        }
+      }
+
+      // cake type filter
+      if (selectedCakeType && selectedCakeType !== "all") {
+        if (String(s.cakeType || "").toLowerCase() !== selectedCakeType) {
+          return false;
+        }
+      }
+
       // date filter: if selected, compare slip.deliveryDate (stored as YYYY-MM-DD)
       if (selectedDateFilter === "today") {
         if (String(s.deliveryDate || "").slice(0, 10) !== todayIso)
@@ -141,6 +163,15 @@ export default function SlipList() {
           .includes(q) ||
         String(s.deliveryDate || "")
           .toLowerCase()
+          .includes(q) ||
+        String(s.customerName || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(s.customerNumber || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(s.billNumber || "")
+          .toLowerCase()
           .includes(q)
       );
     });
@@ -148,6 +179,8 @@ export default function SlipList() {
     search,
     slips,
     selectedBranch,
+    selectedDeliveryType,
+    selectedCakeType,
     selectedDateFilter,
     todayIso,
     tomorrowIso,
@@ -168,35 +201,44 @@ export default function SlipList() {
             <div className="mb-2 flex items-center justify-between gap-3 flex-col md:flex-row sm:flex-row">
               <div className="flex items-center gap-3">
                 <div className="flex flex-wrap gap-3">
-                  <button
-                    onClick={() => setSelectedBranch("all")}
-                    className={`px-4 py-2 rounded-full text-sm border ${
-                      !selectedBranch || selectedBranch === "all"
-                        ? "bg-pink-500 text-white border-pink-500"
-                        : "bg-pink-50 text-gray-800 border-pink-400"
-                    }`}
+                  <select
+                    onChange={(e) => setSelectedBranch(e.target.value)}
+                    value={selectedBranch || "all"}
+                    className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
                   >
-                    All
-                  </button>
+                    <option value="all">All Branches</option>
+                    {branches.map((b: any) => (
+                      <option key={b.id} value={b.id.toLowerCase()}>
+                        {b.name.toUpperCase()}
+                      </option>
+                    ))}
+                  </select>
 
-                  {branches.map((b) => {
-                    const key = String(b.id || b.name).toLowerCase();
-                    const isActive = selectedBranch === key;
-                    return (
-                      <button
-                        key={b.id}
-                        onClick={() => setSelectedBranch(key)}
-                        aria-pressed={isActive}
-                        className={`px-4 py-2 rounded-full text-sm border ${
-                          isActive
-                            ? "bg-pink-500 text-white border-pink-500"
-                            : "bg-pink-50 text-gray-800 border-pink-400"
-                        }`}
-                      >
-                        {b.name}
-                      </button>
-                    );
-                  })}
+                  <select
+                    onChange={(e) => setSelectedDeliveryType(e.target.value)}
+                    value={selectedDeliveryType || "all"}
+                    className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                  >
+                    <option value="all">Delivery Type</option>
+                    {deliveryTypes.map((b: any) => (
+                      <option key={b.id} value={b.id.toLowerCase()}>
+                        {b.name.toUpperCase()}
+                      </option>
+                    ))}
+                  </select>
+
+                  <select
+                    onChange={(e) => setSelectedCakeType(e.target.value)}
+                    value={selectedCakeType || "all"}
+                    className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                  >
+                    <option value="all">Cake Type</option>
+                    {cakeTypes.map((b: any) => (
+                      <option key={b.id} value={b.id.toLowerCase()}>
+                        {b.name.toUpperCase()}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -204,7 +246,7 @@ export default function SlipList() {
                 <input
                   aria-label="Search slips"
                   className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
-                  placeholder="Search by branch, type or date..."
+                  placeholder="Search by name, number, bill, etc..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />

@@ -72,8 +72,32 @@ router.post("/", upload.single("slip"), async (req, res) => {
 //GET /slips to get all slips
 router.get("/", async (req, res) => {
   try {
+    const {
+      branch,
+      deliveryType,
+      cakeType,
+      deliveryDate,
+      customerName,
+      customerNumber,
+      billNumber,
+      hamper,
+    } = req.query;
+
+    const filters = {};
+    if (branch) filters.branch = branch;
+    if (deliveryType) filters.deliveryType = deliveryType;
+    if (cakeType) filters.cakeType = cakeType;
+    if (deliveryDate)
+      filters.deliveryDate = { $regex: deliveryDate, $options: "i" };
+    if (customerName)
+      filters.customerName = { $regex: customerName, $options: "i" };
+    if (customerNumber)
+      filters.customerNumber = { $regex: customerNumber, $options: "i" };
+    if (billNumber) filters.billNumber = { $regex: billNumber, $options: "i" };
+    if (hamper) filters.hamper = hamper === "true";
+
     // Use Mongoose's sort instead of Array.toSorted (toSorted may not exist in Node runtime)
-    const slips = await Slip.find().sort({ createdAt: -1 });
+    const slips = await Slip.find(filters).sort({ createdAt: -1 });
 
     res.json(slips);
   } catch (error) {

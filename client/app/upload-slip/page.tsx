@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import Loader from "../components/Loader";
-import { branches } from "../constants/roles";
+import { branches, cakeTypes, deliveryTypes } from "../constants/roles";
 
 export default function UploadSlip() {
   const [deliveryDay, setDeliveryDay] = useState("");
@@ -22,19 +22,7 @@ export default function UploadSlip() {
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [billNumber, setBillNumber] = useState("");
-  const [hamper, setHamper] = useState("");
-
-  const deliveryTypes = [
-    { id: "delivery", name: "Delivery" },
-    { id: "pickup", name: "Pick Up" },
-  ];
-
-  const cakeTypes = [
-    { id: "cream", name: "Cream" },
-    { id: "fondant", name: "Fondant" },
-    { id: "semi-fondant", name: "Semi Fondant" },
-    { id: "other", name: "Other" },
-  ];
+  const [hamper, setHamper] = useState("no");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files && e.target.files[0];
@@ -66,72 +54,66 @@ export default function UploadSlip() {
     }
 
     // Validate separate date fields and combine into ISO string
-    if (!deliveryDay || !deliveryMonth || !deliveryYear) {
+    if (!deliveryDay || !deliveryMonth) {
       alert("Please provide day, month and year for delivery date.");
       setLoading(false);
       return;
     }
 
     // Validate time selects and convert to 24-hour HH:MM
-    if (!deliveryHour || !deliveryMinute || !deliveryPeriod) {
-      alert("Please provide delivery time (hour, minute and AM/PM).");
-      if (!deliveryHour || !deliveryPeriod) {
-        alert("Please provide delivery time (hour and AM/PM).");
-        setLoading(false);
-        return;
-      }
 
-      const timeStr = `${deliveryHour} ${deliveryPeriod}`; // keep original for display
+    if (!deliveryHour || !deliveryPeriod) {
+      alert("Please provide delivery time (hour and AM/PM).");
+      setLoading(false);
+      return;
+    }
 
-      // Pad day/month to 2 digits
-      const dd = deliveryDay.padStart(2, "0");
-      const mm = deliveryMonth.padStart(2, "0");
-      const isoDate = `${dd}-${mm}`;
+    const timeStr = `${deliveryHour} ${deliveryPeriod}`; // keep original for display
 
-      const formData = new FormData();
-      formData.append("slip", file);
-      formData.append("deliveryDate", isoDate);
-      formData.append("customerName", customerName);
-      formData.append("customerPhone", customerPhone);
-      formData.append("cakeType", cakeType);
-      formData.append("billNumber", billNumber);
-      formData.append("deliveryTime", timeStr);
-      formData.append("deliveryType", deliveryType);
-      formData.append("branch", branch);
-      formData.append("hamper", hamper);
+    // Pad day/month to 2 digits
+    const dd = deliveryDay.padStart(2, "0");
+    const mm = deliveryMonth.padStart(2, "0");
+    const isoDate = `${dd}-${mm}`;
 
-      setLoading(true);
-      try {
-        await axios.post(
-          "https://cake-management.vercel.app/api/slips",
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
-        );
+    const formData = new FormData();
+    formData.append("slip", file);
+    formData.append("deliveryDate", isoDate);
+    formData.append("customerName", customerName);
+    formData.append("customerNumber", customerPhone);
+    formData.append("cakeType", cakeType);
+    formData.append("billNumber", billNumber);
+    formData.append("deliveryTime", timeStr);
+    formData.append("deliveryType", deliveryType);
+    formData.append("branch", branch);
+    formData.append("hamper", hamper);
 
-        // Clear fields after successful upload
-        setFile(null);
-        setPreview(null);
-        setDeliveryDay("");
-        setDeliveryMonth("");
-        setDeliveryYear("");
-        setDeliveryHour("");
-        setDeliveryMinute("");
-        setDeliveryPeriod("");
-        setDeliveryType("");
-        setBranch("");
-        setBillNumber("");
-        setCustomerName("");
-        setCustomerPhone("");
-        setCakeType("");
-        setHamper("");
-      } catch (error) {
-        console.error("Upload request error:", error);
-        // For now we just log. Could set an error state to show to the user.
-      } finally {
-        setLoading(false);
-      }
+    setLoading(true);
+    try {
+      await axios.post("http://localhost:4001/api/slips", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      // Clear fields after successful upload
+      setFile(null);
+      setPreview(null);
+      setDeliveryDay("");
+      setDeliveryMonth("");
+      setDeliveryYear("");
+      setDeliveryHour("");
+      setDeliveryMinute("");
+      setDeliveryPeriod("");
+      setDeliveryType("");
+      setBranch("");
+      setBillNumber("");
+      setCustomerName("");
+      setCustomerPhone("");
+      setCakeType("");
+      setHamper("");
+    } catch (error) {
+      console.error("Upload request error:", error);
+      // For now we just log. Could set an error state to show to the user.
+    } finally {
+      setLoading(false);
     }
   };
 
