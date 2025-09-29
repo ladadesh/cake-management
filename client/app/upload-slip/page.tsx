@@ -8,10 +8,7 @@ import { branches, cakeTypes, deliveryTypes } from "../constants/roles";
 export default function UploadSlip() {
   const [deliveryDay, setDeliveryDay] = useState("");
   const [deliveryMonth, setDeliveryMonth] = useState("");
-  const [deliveryYear, setDeliveryYear] = useState("");
-  // replaced single time string with separate selects for hour/minute/period
   const [deliveryHour, setDeliveryHour] = useState("");
-  const [deliveryMinute, setDeliveryMinute] = useState("");
   const [deliveryPeriod, setDeliveryPeriod] = useState("");
   const [branch, setBranch] = useState("");
   const [cakeType, setCakeType] = useState("");
@@ -98,9 +95,7 @@ export default function UploadSlip() {
       setPreview(null);
       setDeliveryDay("");
       setDeliveryMonth("");
-      setDeliveryYear("");
       setDeliveryHour("");
-      setDeliveryMinute("");
       setDeliveryPeriod("");
       setDeliveryType("");
       setBranch("");

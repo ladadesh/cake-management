@@ -207,7 +207,7 @@ export default function SlipList() {
                     className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
                   >
                     <option value="all">All Branches</option>
-                    {branches.map((b: any) => (
+                    {branches.map((b) => (
                       <option key={b.id} value={b.id.toLowerCase()}>
                         {b.name.toUpperCase()}
                       </option>
@@ -220,7 +220,7 @@ export default function SlipList() {
                     className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
                   >
                     <option value="all">Delivery Type</option>
-                    {deliveryTypes.map((b: any) => (
+                    {deliveryTypes.map((b) => (
                       <option key={b.id} value={b.id.toLowerCase()}>
                         {b.name.toUpperCase()}
                       </option>
@@ -233,7 +233,7 @@ export default function SlipList() {
                     className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
                   >
                     <option value="all">Cake Type</option>
-                    {cakeTypes.map((b: any) => (
+                    {cakeTypes.map((b) => (
                       <option key={b.id} value={b.id.toLowerCase()}>
                         {b.name.toUpperCase()}
                       </option>
