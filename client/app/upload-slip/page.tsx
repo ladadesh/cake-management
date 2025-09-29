@@ -86,9 +86,13 @@ export default function UploadSlip() {
 
     setLoading(true);
     try {
-      await axios.post("http://localhost:4001/api/slips", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await axios.post(
+        "https://cake-management.vercel.app/api/slips",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
       // Clear fields after successful upload
       setFile(null);

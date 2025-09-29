@@ -96,7 +96,9 @@ export default function SlipList() {
   const fetchSlips = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:4001/api/slips");
+      const res = await axios.get(
+        "https://cake-management.vercel.app/api/slips"
+      );
       setSlips(res.data || []);
     } catch (err) {
       console.error("Failed to fetch slips", err);
