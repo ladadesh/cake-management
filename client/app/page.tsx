@@ -13,7 +13,7 @@ export default function HomePage() {
       if (lastCalled !== today) {
         try {
           const response = await axios.delete(
-            "http://localhost:4001/api/slips/old"
+            `${process.env.NEXT_PUBLIC_API_URL}/api/slips/old`
           );
 
           if (response.status === 200) {
