@@ -31,6 +31,7 @@ export default function SlipList() {
   >("all");
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewSlip, setPreviewSlip] = useState<Slip | null>(null);
+  const [showFilters, setShowFilters] = useState(true);
 
   // compute today's and tomorrow's dates for display next to branch buttons
   const today = useMemo(() => new Date(), []);
@@ -197,109 +198,133 @@ export default function SlipList() {
       )}
 
       {/* Top: sticky header / controls */}
-      <div className="bg-white/95 backdrop-blur-sm border-b">
-        <div className="p-3 mx-5">
-          {branches?.length > 0 && (
-            <div className="mb-2 flex items-center justify-between gap-3 flex-col md:flex-row sm:flex-row">
-              <div className="flex items-center gap-3">
-                <div className="flex flex-wrap gap-3">
-                  <select
-                    onChange={(e) => setSelectedBranch(e.target.value)}
-                    value={selectedBranch || "all"}
-                    className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
-                  >
-                    <option value="all">All Branches</option>
-                    {branches.map((b) => (
-                      <option key={b.id} value={b.id.toLowerCase()}>
-                        {b.name.toUpperCase()}
-                      </option>
-                    ))}
-                  </select>
+      <div className="bg-white/95 backdrop-blur-sm border-b relative">
+        {showFilters && (
+          <div className="px-3 mx-4">
+            {branches?.length > 0 && (
+              <div className="flex items-center justify-between gap-3 flex-col md:flex-row sm:flex-row">
+                <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap gap-3">
+                    <select
+                      onChange={(e) => setSelectedBranch(e.target.value)}
+                      value={selectedBranch || "all"}
+                      className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                    >
+                      <option value="all">All Branches</option>
+                      {branches.map((b) => (
+                        <option key={b.id} value={b.id.toLowerCase()}>
+                          {b.name.toUpperCase()}
+                        </option>
+                      ))}
+                    </select>
 
-                  <select
-                    onChange={(e) => setSelectedDeliveryType(e.target.value)}
-                    value={selectedDeliveryType || "all"}
-                    className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
-                  >
-                    <option value="all">Delivery Type</option>
-                    {deliveryTypes.map((b) => (
-                      <option key={b.id} value={b.id.toLowerCase()}>
-                        {b.name.toUpperCase()}
-                      </option>
-                    ))}
-                  </select>
+                    <select
+                      onChange={(e) => setSelectedDeliveryType(e.target.value)}
+                      value={selectedDeliveryType || "all"}
+                      className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                    >
+                      <option value="all">Delivery Type</option>
+                      {deliveryTypes.map((b) => (
+                        <option key={b.id} value={b.id.toLowerCase()}>
+                          {b.name.toUpperCase()}
+                        </option>
+                      ))}
+                    </select>
 
-                  <select
-                    onChange={(e) => setSelectedCakeType(e.target.value)}
-                    value={selectedCakeType || "all"}
-                    className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
-                  >
-                    <option value="all">Cake Type</option>
-                    {cakeTypes.map((b) => (
-                      <option key={b.id} value={b.id.toLowerCase()}>
-                        {b.name.toUpperCase()}
-                      </option>
-                    ))}
-                  </select>
+                    <select
+                      onChange={(e) => setSelectedCakeType(e.target.value)}
+                      value={selectedCakeType || "all"}
+                      className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                    >
+                      <option value="all">Cake Type</option>
+                      {cakeTypes.map((b) => (
+                        <option key={b.id} value={b.id.toLowerCase()}>
+                          {b.name.toUpperCase()}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="w-72 sm:my-2">
+                  <input
+                    aria-label="Search slips"
+                    className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                    placeholder="Search by name, number, bill, etc..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 flex flex-wrap gap-3">
+                    <button
+                      onClick={() => setSelectedDateFilter("all")}
+                      className={`px-3 py-2 border rounded-md text-sm ${
+                        selectedDateFilter === "all"
+                          ? "bg-pink-500 text-white border-pink-500"
+                          : "bg-pink-50 text-gray-700 border-pink-400"
+                      }`}
+                    >
+                      All
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        setSelectedDateFilter(
+                          selectedDateFilter === "today" ? "all" : "today"
+                        )
+                      }
+                      className={`px-3 py-2 border rounded-md text-sm ${
+                        selectedDateFilter === "today"
+                          ? "bg-pink-500 text-white border-pink-500"
+                          : "bg-pink-50 text-gray-700 border-pink-400"
+                      }`}
+                    >
+                      Today: {formatShortDate(today)}
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        setSelectedDateFilter(
+                          selectedDateFilter === "tomorrow" ? "all" : "tomorrow"
+                        )
+                      }
+                      className={`px-3 py-2 border rounded-md text-sm ${
+                        selectedDateFilter === "tomorrow"
+                          ? "bg-pink-500 text-white border-pink-500"
+                          : "bg-pink-50 text-gray-700 border-pink-400"
+                      }`}
+                    >
+                      Tomorrow: {formatShortDate(tomorrow)}
+                    </button>
+                  </div>
                 </div>
               </div>
-
-              <div className="w-72 sm:my-2">
-                <input
-                  aria-label="Search slips"
-                  className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
-                  placeholder="Search by name, number, bill, etc..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="flex-1 flex flex-wrap gap-3">
-                  <button
-                    onClick={() => setSelectedDateFilter("all")}
-                    className={`px-3 py-2 border rounded-md text-sm ${
-                      selectedDateFilter === "all"
-                        ? "bg-pink-500 text-white border-pink-500"
-                        : "bg-pink-50 text-gray-700 border-pink-400"
-                    }`}
-                  >
-                    All
-                  </button>
-
-                  <button
-                    onClick={() =>
-                      setSelectedDateFilter(
-                        selectedDateFilter === "today" ? "all" : "today"
-                      )
-                    }
-                    className={`px-3 py-2 border rounded-md text-sm ${
-                      selectedDateFilter === "today"
-                        ? "bg-pink-500 text-white border-pink-500"
-                        : "bg-pink-50 text-gray-700 border-pink-400"
-                    }`}
-                  >
-                    Today: {formatShortDate(today)}
-                  </button>
-
-                  <button
-                    onClick={() =>
-                      setSelectedDateFilter(
-                        selectedDateFilter === "tomorrow" ? "all" : "tomorrow"
-                      )
-                    }
-                    className={`px-3 py-2 border rounded-md text-sm ${
-                      selectedDateFilter === "tomorrow"
-                        ? "bg-pink-500 text-white border-pink-500"
-                        : "bg-pink-50 text-gray-700 border-pink-400"
-                    }`}
-                  >
-                    Tomorrow: {formatShortDate(tomorrow)}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
+        )}
+        <div className="flex justify-center w-full mt-1">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="p-2 -mb-4 bg-pink-300 hover:bg-pink-400 rounded-full z-10"
+            aria-label={showFilters ? "Hide filters" : "Show filters"}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className={`h-5 w-5 text-white-600 transition-transform ${
+                showFilters ? "rotate-180" : ""
+              }`}
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
         </div>
       </div>
 
