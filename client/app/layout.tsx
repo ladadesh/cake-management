@@ -1,3 +1,4 @@
+import React from "react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -16,7 +17,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cake Affair - Cake Management Tool",
+  title: {
+    template: "%s | Cake Affair",
+    default: "Cake Affair - Cake Management Tool",
+  },
   description: "Cake Management Tool",
   icons: {
     icon: "/watermark.png",
