@@ -190,7 +190,7 @@ export default function SlipList() {
   ]);
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col bg-pink-50 ">
       {loading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center ">
           <Loader />
@@ -198,7 +198,7 @@ export default function SlipList() {
       )}
 
       {/* Top: sticky header / controls */}
-      <div className="bg-white/95 backdrop-blur-sm border-b relative">
+      <div className="backdrop-blur-sm border-b relative">
         {showFilters && (
           <div className="px-3 mx-4">
             {branches?.length > 0 && (
@@ -208,7 +208,7 @@ export default function SlipList() {
                     <select
                       onChange={(e) => setSelectedBranch(e.target.value)}
                       value={selectedBranch || "all"}
-                      className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                      className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-white text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
                     >
                       <option value="all">All Branches</option>
                       {branches.map((b) => (
@@ -221,7 +221,7 @@ export default function SlipList() {
                     <select
                       onChange={(e) => setSelectedDeliveryType(e.target.value)}
                       value={selectedDeliveryType || "all"}
-                      className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                      className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-white text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
                     >
                       <option value="all">Delivery Type</option>
                       {deliveryTypes.map((b) => (
@@ -234,7 +234,7 @@ export default function SlipList() {
                     <select
                       onChange={(e) => setSelectedCakeType(e.target.value)}
                       value={selectedCakeType || "all"}
-                      className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                      className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-white text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
                     >
                       <option value="all">Cake Type</option>
                       {cakeTypes.map((b) => (
@@ -249,7 +249,7 @@ export default function SlipList() {
                 <div className="w-72 sm:my-2">
                   <input
                     aria-label="Search slips"
-                    className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-pink-50 text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                    className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-white text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
                     placeholder="Search by name, number, bill, etc..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
@@ -263,7 +263,7 @@ export default function SlipList() {
                       className={`px-3 py-2 border rounded-md text-sm ${
                         selectedDateFilter === "all"
                           ? "bg-pink-500 text-white border-pink-500"
-                          : "bg-pink-50 text-gray-700 border-pink-400"
+                          : "bg-white text-gray-700 border-pink-400"
                       }`}
                     >
                       All
@@ -278,7 +278,7 @@ export default function SlipList() {
                       className={`px-3 py-2 border rounded-md text-sm ${
                         selectedDateFilter === "today"
                           ? "bg-pink-500 text-white border-pink-500"
-                          : "bg-pink-50 text-gray-700 border-pink-400"
+                          : "bg-white text-gray-700 border-pink-400"
                       }`}
                     >
                       Today: {formatShortDate(today)}
@@ -293,7 +293,7 @@ export default function SlipList() {
                       className={`px-3 py-2 border rounded-md text-sm ${
                         selectedDateFilter === "tomorrow"
                           ? "bg-pink-500 text-white border-pink-500"
-                          : "bg-pink-50 text-gray-700 border-pink-400"
+                          : "bg-white text-gray-700 border-pink-400"
                       }`}
                     >
                       Tomorrow: {formatShortDate(tomorrow)}

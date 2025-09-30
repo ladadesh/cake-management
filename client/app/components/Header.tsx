@@ -1,8 +1,10 @@
 "use client";
+
 import Link from "next/link";
 import { useUser } from "../hooks/useUser";
 import { ROLE_PAGES } from "../constants/roles";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 const Header = () => {
   const { role } = useUser();
@@ -20,10 +22,16 @@ const Header = () => {
   ];
 
   return (
-    <header className="flex justify-between items-center p-4 border-b">
+    <header className="flex justify-between items-center p-4 border-b bg-white/80 backdrop-blur-sm sticky top-0 z-20">
       <Link href="/">
-        <div className="text-pink-600 font-bold text-lg flex items-center">
-          <span className="mr-2">🎂</span> Cake Affair
+        <div className="flex items-center gap-2">
+          <Image
+            src="/logo.png"
+            alt="Cake Affair Logo"
+            width={40}
+            height={40}
+            className="h-10 w-auto"
+          />
         </div>
       </Link>
       <nav className="space-x-4 text-sm font-medium">

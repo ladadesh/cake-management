@@ -26,3 +26,7 @@ body {
 }
 
 .input { @apply border border-gray-300 rounded-md px-4 py-2 w-full; }
+
+.bg-pink-50 {
+  background-color: #fdf2f885 !important;
+}
