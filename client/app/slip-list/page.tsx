@@ -98,7 +98,7 @@ export default function SlipList() {
     setLoading(true);
     try {
       const res = await axios.get(
-        "https://cake-management.vercel.app/api/slips"
+        `${process.env.NEXT_PUBLIC_API_URL}/api/slips`
       );
       setSlips(res.data || []);
     } catch (err) {
