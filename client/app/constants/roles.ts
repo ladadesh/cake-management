@@ -18,7 +18,6 @@ export const branches = [
   { id: "khamla", name: "Khamla" },
   { id: "sakkardara", name: "Sakkardara" },
   { id: "dharampeth", name: "Dharampeth" },
-  { id: "kapilNagar", name: "Kapil Nagar" },
 ];
 
 export const deliveryTypes = [

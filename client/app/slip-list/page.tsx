@@ -330,38 +330,49 @@ export default function SlipList() {
 
       {/* Scrollable content area: only this scrolls */}
       <main className="flex-1 overflow-auto p-5">
-        <div className="mx-5">
+        <div className="mx-2">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-2xl font-semibold">Uploaded Slips</h3>
+            <h3 className="text-2xl font-semibold">Uploaded KOT</h3>
           </div>
 
           {filteredSlips.length === 0 ? (
             <p className="text-gray-500">No slips found.</p>
           ) : (
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
               {filteredSlips.map((slip) => (
                 <li key={slip._id}>
                   <div className="w-full max-w-md bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition overflow-hidden">
-                    <div className="relative p-4 bg-gray-50">
+                    <div
+                      className="relative p-4 bg-gray-50"
+                      onClick={() => openPreview(slip.imageUrl, slip)}
+                    >
                       <img
                         src={
                           (slip.imageUrl && slip.imageUrl) || "/placeholder.png"
                         }
                         alt={`Slip for ${slip.branch}`}
-                        className="w-full h-64 object-contain rounded-md border"
+                        className="w-full h-32 object-contain rounded-md border"
                       />
                     </div>
 
-                    <div className="p-6">
-                      <h4 className="text-xl font-semibold mb-2">
-                        {slip.branch?.toUpperCase() || "Branch"}
-                      </h4>
+                    <div className="p-2">
+                      <div className="flex items-center gap-1">
+                        <h4 className="text-l font-semibold mb-2 mt-2">
+                          {slip.branch?.toUpperCase() || "Branch"}
+                        </h4>
 
-                      <div className="flex items-center gap-3 mb-3">
-                        <span className="text-sm font-medium text-gray-600 text-transform: uppercase">
+                        <span
+                          className={`text-sm font-medium text-white-600 text-transform: uppercase ${
+                            slip.deliveryType === "delivery"
+                              ? "bg-orange-500"
+                              : "bg-green-500"
+                          } px-1 py-1 ml-1 rounded`}
+                        >
                           {slip.deliveryType || "Delivery"}
                         </span>
-                        <span className="text-gray-300">•</span>
+                      </div>
+
+                      <div className="flex items-center gap-3 mb-3">
                         <div className="flex items-center gap-2">
                           <span className="text-base font-medium text-gray-700">
                             {slip.deliveryDate}
@@ -370,34 +381,6 @@ export default function SlipList() {
                             {slip.deliveryTime}
                           </span>
                         </div>
-                      </div>
-
-                      <div className="flex items-center justify-between mt-4 gap-2">
-                        <button
-                          onClick={() => openPreview(slip.imageUrl, slip)}
-                          className="inline-flex items-center px-4 py-2 bg-pink-500 hover:bg-pink-700 text-white text-base rounded-md cursor-pointer"
-                        >
-                          View
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            className="ml-2 bi bi-eye"
-                            viewBox="0 0 16 16"
-                          >
-                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z" />
-                            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0" />
-                          </svg>
-                        </button>
-                        <a
-                          href={slip.imageUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-sm text-gray-500 underline"
-                        >
-                          Open image
-                        </a>
                       </div>
                     </div>
                   </div>

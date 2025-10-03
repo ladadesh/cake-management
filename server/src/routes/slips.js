@@ -20,6 +20,7 @@ router.post("/", upload.single("slip"), async (req, res) => {
       billNumber,
       customerNumber,
       hamper,
+      topper,
     } = req.body;
 
     if (!req.file) {
@@ -58,6 +59,7 @@ router.post("/", upload.single("slip"), async (req, res) => {
       billNumber,
       customerNumber,
       hamper,
+      topper,
       imageUrl: uploadedSlipImg.secure_url,
     });
 

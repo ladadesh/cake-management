@@ -20,6 +20,7 @@ export default function UploadSlip() {
   const [customerPhone, setCustomerPhone] = useState("");
   const [billNumber, setBillNumber] = useState("");
   const [hamper, setHamper] = useState("no");
+  const [topper, setTopper] = useState("no");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files && e.target.files[0];
@@ -83,6 +84,7 @@ export default function UploadSlip() {
     formData.append("deliveryType", deliveryType);
     formData.append("branch", branch);
     formData.append("hamper", hamper);
+    formData.append("topper", topper);
 
     setLoading(true);
     try {
@@ -108,6 +110,7 @@ export default function UploadSlip() {
       setCustomerPhone("");
       setCakeType("");
       setHamper("");
+      setTopper("");
     } catch (error) {
       console.error("Upload request error:", error);
       // For now we just log. Could set an error state to show to the user.
@@ -120,7 +123,7 @@ export default function UploadSlip() {
     <main className="min-h-screen bg-pink-50 py-6 px-4">
       <div className="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-md relative">
         <h2 className="text-2xl font-bold text-pink-600 mb-4">
-          Upload Info Slip
+          Upload Cake KOT
         </h2>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
@@ -314,7 +317,7 @@ export default function UploadSlip() {
                 Bill Number
               </label>
               <input
-                type="text"
+                type="number"
                 id="billNumber"
                 value={billNumber}
                 onChange={(e) => setBillNumber(e.target.value)}
@@ -326,38 +329,69 @@ export default function UploadSlip() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block font-semibold mb-1">Hamper</label>
-              <div className="flex gap-4 mt-3">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="hamper"
-                    value="yes"
-                    checked={hamper === "yes"}
-                    onChange={(e) => setHamper(e.target.value)}
-                    className="h-4 w-4 accent-pink-600 border-gray-300 focus:ring-pink-500 "
-                    disabled={loading}
-                  />
-                  Yes
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="hamper"
-                    value="no"
-                    checked={hamper === "no" || hamper === ""}
-                    onChange={(e) => setHamper(e.target.value)}
-                    className="h-4 w-4 accent-pink-600 border-gray-300 focus:ring-pink-500 "
-                    disabled={loading}
-                  />
-                  No
-                </label>
+            <div className="flex justify-between align-center">
+              <div>
+                <label className="block font-semibold mb-1">Hamper</label>
+                <div className="flex gap-4 mt-3">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="hamper"
+                      value="yes"
+                      checked={hamper === "yes"}
+                      onChange={(e) => setHamper(e.target.value)}
+                      className="h-4 w-4 accent-pink-600 border-gray-300 focus:ring-pink-500 "
+                      disabled={loading}
+                    />
+                    Yes
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="hamper"
+                      value="no"
+                      checked={hamper === "no" || hamper === ""}
+                      onChange={(e) => setHamper(e.target.value)}
+                      className="h-4 w-4 accent-pink-600 border-gray-300 focus:ring-pink-500 "
+                      disabled={loading}
+                    />
+                    No
+                  </label>
+                </div>
+              </div>
+              <div className="">
+                <label className="block font-semibold mb-1">Cake Topper</label>
+                <div className="flex gap-4 mt-3">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="topper"
+                      value="yes"
+                      checked={topper === "yes"}
+                      onChange={(e) => setTopper(e.target.value)}
+                      className="h-4 w-4 accent-pink-600 border-gray-300 focus:ring-pink-500 "
+                      disabled={loading}
+                    />
+                    Yes
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="topper"
+                      value="no"
+                      checked={topper === "no" || topper === ""}
+                      onChange={(e) => setTopper(e.target.value)}
+                      className="h-4 w-4 accent-pink-600 border-gray-300 focus:ring-pink-500 "
+                      disabled={loading}
+                    />
+                    No
+                  </label>
+                </div>
               </div>
             </div>
             <div>
               <label className="block font-semibold mb-1">
-                Upload Slip (image)
+                Upload KOT (image)
               </label>
 
               <div className="flex items-center gap-3">
@@ -431,43 +465,7 @@ export default function UploadSlip() {
               className="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-4 rounded-md w-full disabled:opacity-60 disabled:cursor-not-allowed"
               disabled={loading}
             >
-              {loading ? (
-                <span className="inline-flex items-center justify-center gap-2">
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden
-                  >
-                    <g>
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        strokeOpacity="0.25"
-                        stroke="#fff"
-                        strokeWidth="4"
-                      />
-                      <path fill="#fff">
-                        <animateTransform
-                          attributeType="xml"
-                          attributeName="transform"
-                          type="rotate"
-                          from="0 12 12"
-                          to="360 12 12"
-                          dur="1s"
-                          repeatCount="indefinite"
-                        />
-                      </path>
-                    </g>
-                  </svg>
-                  Uploading...
-                </span>
-              ) : (
-                "Upload Slip"
-              )}
+              {loading ? <Loader /> : "Upload KOT"}
             </button>
           </div>
         </form>

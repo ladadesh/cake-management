@@ -12,6 +12,7 @@ const slipSchema = new mongoose.Schema({
   customerNumber: { type: String, required: true },
   billNumber: { type: String, required: false },
   hamper: { type: String, required: false },
+  topper: { type: String, required: false },
 });
 
 export default mongoose.model("Slip", slipSchema);
