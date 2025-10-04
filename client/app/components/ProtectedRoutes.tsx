@@ -4,7 +4,6 @@ import { ROLE_PAGES } from "../constants/roles";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import path from "path";
 
 // Define routes that don't require authentication
 const PUBLIC_ROUTES = ["/login", "/register", "/unauthorized"];

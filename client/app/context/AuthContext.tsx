@@ -7,7 +7,7 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import axios from "axios"; // Using axios directly here, but could also be your api.ts instance
+import axios, { isAxiosError } from "axios"; // Using axios directly here, but could also be your api.ts instance
 import { useRouter } from "next/navigation";
 import { UserRole } from "../constants/roles";
 
@@ -56,7 +56,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Auth Provider
 // ========================
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User>(null);
+  const [user, setUser] = useState<User>({
+    id: "",
+    name: "",
+    email: "",
+    role: "employee",
+  } as User);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
@@ -108,10 +113,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await fetchUserData(data.token);
 
       return { success: true };
-    } catch (error: any) {
+    } catch (error) {
       console.error("Login error:", error);
-      const message =
-        error.response?.data?.message || "An error occurred during login";
+      let message = "An error occurred during login";
+      if (isAxiosError(error) && error.response?.data?.message) {
+        message = error.response.data.message;
+      }
       return { success: false, message };
     } finally {
       setIsLoading(false);
@@ -138,11 +145,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         success: true,
         message: data.message || "Registration successful. Please log in.",
       };
-    } catch (error: any) {
+    } catch (error) {
       console.error("Registration error:", error);
-      const message =
-        error.response?.data?.message ||
-        "An error occurred during registration";
+      let message = "An error occurred during registration";
+      if (isAxiosError(error) && error.response?.data?.message) {
+        message = error.response.data.message;
+      }
       return { success: false, message };
     } finally {
       setIsLoading(false);
@@ -154,7 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // ========================
   const logout = () => {
     localStorage.removeItem("token");
-    setUser(null);
+    setUser({ id: "", name: "", email: "", role: "employee" });
     router.push("/login");
   };
 
@@ -164,7 +172,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = {
     user, // The user object
     token: typeof window !== "undefined" ? localStorage.getItem("token") : null, // Provide token if needed elsewhere
-    isAuthenticated: !!user,
+    isAuthenticated: user && user.id !== "", // Simple check for authentication
     isLoading,
     login,
     register,

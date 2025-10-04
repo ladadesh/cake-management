@@ -212,7 +212,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
       <div className="mt-4 text-center text-sm">
         {mode === "login" ? (
           <p>
-            Don't have an account?{" "}
+            {"Don't have an account?"}
             <Link
               href="/register"
               className="text-pink-600 hover:text-pink-800 font-medium"
@@ -222,7 +222,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
           </p>
         ) : (
           <p>
-            Already have an account?{" "}
+            Already have an account?
             <Link
               href="/login"
               className="text-pink-600 hover:text-pink-800 font-medium"
