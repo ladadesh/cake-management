@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import slipRoutes from "./routes/slips.js";
+import authRoutes from "./models/auth.js";
 
 dotenv.config();
 
@@ -29,6 +30,9 @@ app.get("/", (req, res) => {
 
 //routes
 app.use("/api/slips", slipRoutes);
+
+// auth routes
+app.use("/api/auth", authRoutes);
 
 //start server
 const PORT = 4001;
