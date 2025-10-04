@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import slipRoutes from "./routes/slips.js";
-import authRoutes from "./models/auth.js";
+import authRoutes from "./routes/auth.js";
 
 dotenv.config();
 

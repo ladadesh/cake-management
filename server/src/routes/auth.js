@@ -1,6 +1,7 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import authMiddleware from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -52,7 +53,9 @@ router.post("/login", async (req, res) => {
     }
 
     // Find user by email
-    const user = await User.findOne({ email });
+    const user = await User.findOne({
+      $or: [{ email }, { username: email }],
+    });
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials." });
     }
@@ -60,7 +63,7 @@ router.post("/login", async (req, res) => {
     // Compare passwords using the method from your User model
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid credentials." });
+      return res.status(400).json({ message: "Password is incorrect." });
     }
 
     // Create and sign a JWT
@@ -76,11 +79,27 @@ router.post("/login", async (req, res) => {
 
     const token = jwt.sign(payload, secret, { expiresIn });
 
-    res.json({ token });
+    res.json({
+      token,
+      user: { id: user.id, username: user.username, email: user.email },
+    });
   } catch (error) {
     res
       .status(500)
       .json({ message: "Server error during login.", error: error.message });
+  }
+});
+
+// --- Get User Data Route ---
+// Path: /api/auth/me
+// Protected Route
+router.get("/me", authMiddleware, async (req, res) => {
+  try {
+    // req.user is attached by the authMiddleware
+    const user = await User.findById(req.user.id).select("-password");
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 

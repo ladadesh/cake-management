@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { useUser } from "../hooks/useUser";
+import { useAuth } from "../context/AuthContext";
 import { ROLE_PAGES } from "../constants/roles";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 
 const Header = () => {
-  const { role } = useUser();
+  const { role, isAuthenticated, name } = useUser();
+  const { logout } = useAuth();
   const pathname = usePathname();
   const allowedRoutes = ROLE_PAGES[role];
 
@@ -34,23 +36,65 @@ const Header = () => {
           />
         </div>
       </Link>
-      <nav className="space-x-4 text-sm font-medium">
-        {links
-          .filter((link) => allowedRoutes.includes(link.href))
-          .map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`${
-                pathname === link.href
-                  ? "text-pink-600 border-b-2 border-pink-600 pb-1"
-                  : "hover:text-pink-600"
-              }`}
+
+      {isAuthenticated ? (
+        <div className="flex items-center">
+          {/* Navigation links for authenticated users */}
+          <nav className="space-x-4 text-sm font-medium mr-6">
+            {links
+              .filter((link) => allowedRoutes.includes(link.href))
+              .map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`${
+                    pathname === link.href
+                      ? "text-pink-600 border-b-2 border-pink-600 pb-1"
+                      : "hover:text-pink-600"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+          </nav>
+
+          {/* User profile and logout */}
+          <div className="flex items-center gap-4">
+            <span className="text-sm font-medium">
+              Welcome, {name.toUpperCase() || "User"}
+            </span>
+            <button
+              onClick={logout}
+              className="text-sm px-3 py-1 bg-pink-600 hover:bg-pink-700 text-white rounded transition-colors"
             >
-              {link.label}
-            </Link>
-          ))}
-      </nav>
+              Logout
+            </button>
+          </div>
+        </div>
+      ) : (
+        <nav className="space-x-4 text-sm font-medium">
+          <Link
+            href="/login"
+            className={`${
+              pathname === "/login"
+                ? "text-pink-600 border-b-2 border-pink-600 pb-1"
+                : "hover:text-pink-600"
+            }`}
+          >
+            Login
+          </Link>
+          <Link
+            href="/register"
+            className={`${
+              pathname === "/register"
+                ? "text-pink-600 border-b-2 border-pink-600 pb-1"
+                : "hover:text-pink-600"
+            }`}
+          >
+            Register
+          </Link>
+        </nav>
+      )}
     </header>
   );
 };

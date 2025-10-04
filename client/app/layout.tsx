@@ -5,6 +5,7 @@ import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ProtectedRoutes from "./components/ProtectedRoutes";
+import { AuthProvider } from "./context/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,19 +38,21 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen relative`}
       >
-        <ProtectedRoutes>
-          <div
-            className="fixed inset-0 z-[-1] opacity-5 pointer-events-none"
-            style={{
-              backgroundImage: "url(/watermark.png)",
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "center",
-            }}
-          />
-          <Header />
-          {children}
-          <Footer />
-        </ProtectedRoutes>
+        <AuthProvider>
+          <ProtectedRoutes>
+            <div
+              className="fixed inset-0 z-[-1] opacity-5 pointer-events-none"
+              style={{
+                backgroundImage: "url(/watermark.png)",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center",
+              }}
+            />
+            <Header />
+            {children}
+            <Footer />
+          </ProtectedRoutes>
+        </AuthProvider>
       </body>
     </html>
   );
