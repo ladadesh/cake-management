@@ -28,14 +28,14 @@ const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
-    // Redirect to login if not authenticated
-    if (!isAuthenticated) {
-      router.replace("/login");
+    // Allow access to public routes without authentication
+    if (PUBLIC_ROUTES.includes(pathName)) {
       return;
     }
 
-    // Allow access to public routes without authentication
-    if (PUBLIC_ROUTES.includes(pathName)) {
+    // Redirect to login if not authenticated
+    if (!isAuthenticated) {
+      router.replace("/login");
       return;
     }
 
