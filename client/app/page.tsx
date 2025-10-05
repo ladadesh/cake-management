@@ -55,6 +55,12 @@ export default function HomePage() {
       link: "/slip-list",
     },
     {
+      title: "User Management",
+      desc: "Manage user accounts, roles, and permissions with ease.",
+      icon: "👥",
+      link: "/users",
+    },
+    {
       title: "Place Order",
       desc: "Simple form to place your custom cake orders with all the details you need.",
       icon: "🛍️",
