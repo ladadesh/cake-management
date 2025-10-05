@@ -16,7 +16,10 @@ export default function (req, res, next) {
 
     // 4. Verify the token using the secret key
     // This will throw an error if the token is invalid or expired
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "zaxscdvfbgnhmj"
+    );
 
     // 5. Attach the user payload from the token to the request object
     req.user = decoded.user;
