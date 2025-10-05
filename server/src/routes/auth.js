@@ -74,7 +74,7 @@ router.post("/login", async (req, res) => {
     };
 
     // You should store your JWT_SECRET in an environment variable file (.env)
-    const secret = process.env.JWT_SECRET;
+    const secret = process.env.JWT_SECRET || "zaxscdvfbgnhmj";
     const expiresIn = process.env.JWT_EXPIRES_IN || "7d";
 
     const token = jwt.sign(payload, secret, { expiresIn });
