@@ -1,17 +1,9 @@
-export type UserRole = "superuser" | "owner" | "employee" | "delivery";
+export type UserRole = "admin" | "staff" | "delivery";
 
 export const ROLE_PAGES: Record<UserRole, string[]> = {
-  superuser: [
-    "/",
-    "/place-order",
-    "/orders",
-    "/admin",
-    "/users",
-    "/upload-slip",
-  ],
-  owner: ["/", "/place-order", "/orders", "/users", "/upload-slip"],
-  employee: ["/", "/upload-slip", "/slip-list"],
-  delivery: ["/", "/orders", "/upload-slip"],
+  admin: ["/", "/orders", "/users", "/upload-slip"],
+  staff: ["/", "/upload-slip", "/slip-list"],
+  delivery: ["/", "/delivery"],
 };
 
 export const branches = [

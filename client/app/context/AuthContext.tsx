@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     id: "",
     name: "",
     email: "",
-    role: "employee",
+    role: "staff",
   } as User);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -91,7 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: data._id, // MongoDB uses _id by default
         name: data.username,
         email: data.email,
-        role: "employee",
+        role: data.role,
       });
       setIsLoading(false);
     } catch (error) {
@@ -162,7 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // ========================
   const logout = () => {
     localStorage.removeItem("token");
-    setUser({ id: "", name: "", email: "", role: "employee" });
+    setUser({ id: "", name: "", email: "", role: "staff" });
     router.push("/login");
   };
 

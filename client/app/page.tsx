@@ -2,9 +2,15 @@
 
 import React, { useEffect } from "react";
 import Link from "next/link";
+import { useAuth } from "./context/AuthContext";
+import { ROLE_PAGES } from "./constants/roles";
 import axios from "axios";
 
 export default function HomePage() {
+  const {
+    user: { role },
+  } = useAuth();
+
   useEffect(() => {
     const deleteOldSlips = async () => {
       const lastCalled = localStorage.getItem("lastCalled");
@@ -31,44 +37,52 @@ export default function HomePage() {
     };
 
     deleteOldSlips(); // Call the function when the component mounts
-  }, []);
+  }, []); // Empty dependency array ensures this runs only once on mount
+
+  const allowedRoutes = ROLE_PAGES[role] || [];
+
+  const featureCards = [
+    {
+      title: "Upload Slip",
+      desc: "Simple form to place your custom cake orders slip with all the details.",
+      icon: "📄",
+      link: "/upload-slip",
+    },
+    {
+      title: "Slip List",
+      desc: "View and manage all your cake orders in one convenient dashboard.",
+      icon: "🧾",
+      link: "/slip-list",
+    },
+    {
+      title: "Place Order",
+      desc: "Simple form to place your custom cake orders with all the details you need.",
+      icon: "🛍️",
+      link: "/place-order",
+    },
+    {
+      title: "Order Management",
+      desc: "View and manage all your cake orders in one convenient dashboard.",
+      icon: "📄",
+      link: "/orders",
+    },
+    {
+      title: "Timely Delivery",
+      desc: "Track your orders and get your delicious cakes right on time for your special occasions.",
+      icon: "⏰",
+      link: "/delivery",
+    },
+  ];
 
   return (
     <main className="min-h-screen bg-pink-50 py-10 px-4">
       <section className="flex flex-col items-center text-center p-8">
         <div className="grid md:grid-cols-2 gap-4 mt-8 w-full max-w-4xl">
-          <FeatureCard
-            title="Upload Slip"
-            desc="Simple form to place your custom cake orders slip with all the details."
-            icon="📄"
-            link="upload-slip"
-          />
-
-          <FeatureCard
-            title="Slip List"
-            desc="View and manage all your cake orders in one convenient dashboard."
-            icon="🧾"
-            link="slip-list"
-          />
-
-          {/* <FeatureCard
-            title="Place Order"
-            desc="Simple form to place your custom cake orders with all the details you need."
-            icon="🛍️"
-            link="place-order"
-          />
-          <FeatureCard
-            title="Order Management"
-            desc="View and manage all your cake orders in one convenient dashboard."
-            icon="📄"
-            link="orders"
-          />
-          <FeatureCard
-            title="Timely Delivery"
-            desc="Track your orders and get your delicious cakes right on time for your special occasions."
-            icon="⏰"
-            link="/"
-          /> */}
+          {featureCards
+            .filter((card) => allowedRoutes.includes(card.link))
+            .map((card) => (
+              <FeatureCard key={card.link} {...card} />
+            ))}
         </div>
       </section>
     </main>
