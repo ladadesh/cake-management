@@ -1,8 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Edit } from "lucide-react";
-import { getUsers, updateUser, User } from "../services/userService";
+import { Edit, Trash2 } from "lucide-react";
+import {
+  getUsers,
+  updateUser,
+  deleteUser,
+  User,
+} from "../services/userService";
 import Loader from "../components/Loader";
 import Modal from "../components/Modal";
 
@@ -13,7 +18,9 @@ const UsersPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [editFormData, setEditFormData] = useState({
     username: "",
     email: "",
@@ -52,6 +59,11 @@ const UsersPage = () => {
     setSelectedUser(null);
   };
 
+  const handleDeleteClick = (user: User) => {
+    setUserToDelete(user);
+    setIsDeleteModalOpen(true);
+  };
+
   const handleFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -73,6 +85,21 @@ const UsersPage = () => {
     }
   };
 
+  const handleConfirmDelete = async () => {
+    if (!userToDelete) return;
+
+    try {
+      await deleteUser(userToDelete._id);
+      setUsers(users.filter((u) => u._id !== userToDelete._id));
+      setIsDeleteModalOpen(false);
+      setUserToDelete(null);
+    } catch (err) {
+      console.error("Failed to delete user", err);
+      setError("Failed to delete user.");
+      setIsDeleteModalOpen(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -86,7 +113,7 @@ const UsersPage = () => {
   }
 
   return (
-    <div className="container mx-auto p-4 md:p-8">
+    <div className="min-h-screen bg-pink-50 py-6 px-12">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">User Management</h1>
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
@@ -105,13 +132,20 @@ const UsersPage = () => {
                   <td className="px-5 py-4 text-sm">{user.username}</td>
                   <td className="px-5 py-4 text-sm">{user.email}</td>
                   <td className="px-5 py-4 text-sm capitalize">{user.role}</td>
-                  <td className="px-5 py-4 text-sm">
+                  <td className="px-5 py-4 text-sm flex items-center gap-4">
                     <button
                       onClick={() => handleEditClick(user)}
                       className="text-pink-600 hover:text-pink-800"
                       title="Edit User"
                     >
                       <Edit size={18} />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteClick(user)}
+                      className="text-pink-600 hover:text-pink-800"
+                      title="Delete User"
+                    >
+                      <Trash2 size={18} />
                     </button>
                   </td>
                 </tr>
@@ -192,6 +226,34 @@ const UsersPage = () => {
             </button>
           </div>
         </form>
+      </Modal>
+
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Confirm Deletion"
+      >
+        <div className="text-center">
+          <p className="text-gray-700 mb-6">
+            Are you sure you want to delete the user{" "}
+            <strong>{userToDelete?.username}</strong>? This action cannot be
+            undone.
+          </p>
+          <div className="flex justify-center gap-4">
+            <button
+              onClick={() => setIsDeleteModalOpen(false)}
+              className="px-6 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleConfirmDelete}
+              className="px-6 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

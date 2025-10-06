@@ -2,6 +2,7 @@ import { adminUser } from "../middleware/auth.js";
 import User from "../models/User.js";
 import authMiddleware from "../middleware/auth.js";
 import express from "express";
+import { ObjectId } from "mongodb";
 
 const router = express.Router();
 
@@ -31,6 +32,27 @@ router.put("/:id", authMiddleware, async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: "Server Error" });
+  }
+});
+
+router.delete("/:id", authMiddleware, async (req, res) => {
+  if (!ObjectId.isValid(req.params.id)) {
+    res.status(400);
+    throw new Error("Invalid user ID");
+  }
+
+  const user = await User.findById(req.params.id);
+
+  if (user) {
+    if (user._id.equals(req.user._id)) {
+      res.status(400);
+      throw new Error("Cannot delete admin user");
+    }
+    await user.deleteOne();
+    res.status(200).json({ message: "User removed successfully" });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
   }
 });
 
