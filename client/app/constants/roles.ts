@@ -1,7 +1,7 @@
 export type UserRole = "admin" | "staff" | "delivery";
 
 export const ROLE_PAGES: Record<UserRole, string[]> = {
-  admin: ["/", "/slip-list", "/users", "/upload-slip"],
+  admin: ["/", "/slip-list", "/users", "/upload-slip", "/delivery"],
   staff: ["/", "/upload-slip", "/slip-list"],
   delivery: ["/", "/delivery"],
 };

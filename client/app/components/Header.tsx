@@ -18,9 +18,10 @@ const Header = () => {
     { href: "/upload-slip", label: "Upload Slip" },
     { href: "/place-order", label: "Place Order" },
     { href: "/orders", label: "View Orders" },
+    { href: "/slip-list", label: "Slip List" },
     { href: "/users", label: "Users" },
     { href: "/admin", label: "Admin" },
-    { href: "/slip-list", label: "Slip List" },
+    { href: "/delivery", label: "Delivery" },
   ];
 
   return (

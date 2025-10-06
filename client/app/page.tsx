@@ -74,7 +74,7 @@ export default function HomePage() {
     },
     {
       title: "Timely Delivery",
-      desc: "Track your orders and get your delicious cakes right on time for your special occasions.",
+      desc: "Track your cakes right on time for your special occasions.",
       icon: "⏰",
       link: "/delivery",
     },
