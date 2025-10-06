@@ -6,7 +6,7 @@ import { getUsers, updateUser, User } from "../services/userService";
 import Loader from "../components/Loader";
 import Modal from "../components/Modal";
 
-const USER_ROLES: User["role"][] = ["admin", "staff", "delivery"];
+const USER_ROLES: User["role"][] = ["admin", "staff", "delivery", "chef"];
 
 const UsersPage = () => {
   const [users, setUsers] = useState<User[]>([]);

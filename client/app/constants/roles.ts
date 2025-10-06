@@ -1,9 +1,10 @@
-export type UserRole = "admin" | "staff" | "delivery";
+export type UserRole = "admin" | "staff" | "delivery" | "chef";
 
 export const ROLE_PAGES: Record<UserRole, string[]> = {
   admin: ["/", "/slip-list", "/users", "/upload-slip", "/delivery"],
   staff: ["/", "/upload-slip", "/slip-list"],
   delivery: ["/", "/delivery"],
+  chef: ["/", "/slip-list"],
 };
 
 export const branches = [

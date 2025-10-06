@@ -4,7 +4,7 @@ export interface User {
   _id: string;
   username: string;
   email: string;
-  role: "admin" | "staff" | "delivery";
+  role: "admin" | "staff" | "delivery" | "chef";
 }
 
 export const getUsers = async (): Promise<User[]> => {
