@@ -71,11 +71,11 @@ export default function UploadSlip() {
     // Pad day/month to 2 digits
     const dd = deliveryDay.padStart(2, "0");
     const mm = deliveryMonth.padStart(2, "0");
-    const isoDate = `${dd}-${mm}`;
 
     const formData = new FormData();
     formData.append("slip", file);
-    formData.append("deliveryDate", isoDate);
+    formData.append("deliveryMonth", mm);
+    formData.append("deliveryDate", dd);
     formData.append("customerName", customerName);
     formData.append("customerNumber", customerPhone);
     formData.append("cakeType", cakeType);

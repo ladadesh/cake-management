@@ -15,6 +15,8 @@ interface Slip {
   customerNumber?: string;
   billNumber?: string;
   cakeType?: string;
+  topper?: string;
+  hamper?: string;
 }
 
 export default function SlipList() {
@@ -338,48 +340,87 @@ export default function SlipList() {
           {filteredSlips.length === 0 ? (
             <p className="text-gray-500">No slips found.</p>
           ) : (
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {filteredSlips.map((slip) => (
                 <li key={slip._id}>
-                  <div className="w-full max-w-md bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition overflow-hidden">
+                  <div className="group bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
+                    {/* Image Section */}
                     <div
-                      className="relative p-4 bg-gray-50"
+                      className="relative cursor-pointer"
                       onClick={() => openPreview(slip.imageUrl, slip)}
                     >
                       <img
-                        src={
-                          (slip.imageUrl && slip.imageUrl) || "/placeholder.png"
-                        }
+                        src={slip.imageUrl || "/placeholder.png"}
                         alt={`Slip for ${slip.branch}`}
-                        className="w-full h-32 object-contain rounded-md border"
+                        className="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-105"
                       />
+                      <div className="absolute top-2 right-2 bg-white/80 text-gray-800 text-xs px-2 py-1 rounded-lg shadow-sm">
+                        #{slip.billNumber}
+                      </div>
                     </div>
 
-                    <div className="p-2">
-                      <div className="flex items-center gap-1">
-                        <h4 className="text-l font-semibold mb-2 mt-2">
+                    {/* Info Section */}
+                    <div className="p-4">
+                      {/* Branch + Delivery Type */}
+                      <div className="flex justify-between items-center mb-3">
+                        <h3 className="text-lg font-semibold text-gray-800">
                           {slip.branch?.toUpperCase() || "Branch"}
-                        </h4>
-
+                        </h3>
                         <span
-                          className={`text-sm font-medium text-white-600 text-transform: uppercase ${
+                          className={`text-xs font-medium uppercase px-2 py-1 rounded-full ${
                             slip.deliveryType === "delivery"
-                              ? "bg-orange-500"
-                              : "bg-green-500"
-                          } px-1 py-1 ml-1 rounded`}
+                              ? "bg-orange-100 text-orange-700"
+                              : "bg-green-100 text-green-700"
+                          }`}
                         >
-                          {slip.deliveryType || "Delivery"}
+                          {slip.deliveryType}
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="flex items-center gap-2">
-                          <span className="text-base font-medium text-gray-700">
-                            {slip.deliveryDate}
-                          </span>
-                          <span className="text-sm text-gray-500 bg-pink-50 px-2 py-1 rounded">
-                            {slip.deliveryTime}
-                          </span>
+                      {/* Customer Info */}
+                      <div className="space-y-1 mb-3 flex justify-between">
+                        <p className="text-sm text-gray-700 font-medium">
+                          👤 {slip.customerName}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          📞 {slip.customerNumber}
+                        </p>
+                      </div>
+
+                      {/* Cake Details */}
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        <span className="bg-pink-100 text-pink-700 text-xs font-semibold px-2.5 py-1 rounded-full">
+                          {slip.cakeType} cake
+                        </span>
+                        <span
+                          className={`${
+                            slip.topper === "yes"
+                              ? "bg-purple-100 text-purple-700"
+                              : "bg-gray-100 text-gray-600"
+                          } text-xs font-semibold px-2.5 py-1 rounded-full`}
+                        >
+                          Topper: {slip.topper}
+                        </span>
+                        <span
+                          className={`${
+                            slip.hamper === "yes"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-gray-100 text-gray-600"
+                          } text-xs font-semibold px-2.5 py-1 rounded-full`}
+                        >
+                          Hamper: {slip.hamper}
+                        </span>
+                      </div>
+
+                      {/* Delivery Info */}
+                      <div className="flex justify-between items-center mt-4">
+                        <div>
+                          <p className="text-sm text-gray-700 font-medium">
+                            📅 {slip.deliveryDate}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            ⏰ {slip.deliveryTime}
+                          </p>
                         </div>
                       </div>
                     </div>

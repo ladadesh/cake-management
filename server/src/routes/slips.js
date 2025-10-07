@@ -21,6 +21,7 @@ router.post("/", upload.single("slip"), async (req, res) => {
       customerNumber,
       hamper,
       topper,
+      deliveryMonth,
     } = req.body;
 
     if (!req.file) {
@@ -51,6 +52,7 @@ router.post("/", upload.single("slip"), async (req, res) => {
     //save in mongoDB
     const slip = new Slip({
       deliveryDate,
+      deliveryMonth,
       deliveryTime,
       branch,
       deliveryType,

@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const slipSchema = new mongoose.Schema({
   deliveryDate: { type: String, required: true },
+  deliveryMonth: { type: String, required: true },
   deliveryTime: { type: String, required: true },
   branch: { type: String, required: true },
   deliveryType: { type: String, required: true },
