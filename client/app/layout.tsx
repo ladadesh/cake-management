@@ -41,7 +41,7 @@ export default function RootLayout({
         <AuthProvider>
           <ProtectedRoutes>
             <div
-              className="fixed inset-0 z-[-1] opacity-5 pointer-events-none"
+              className="fixed inset-0 z-[-1] opacity-5 pointer-events-none bg-pink-50"
               style={{
                 backgroundImage: "url(/watermark.png)",
                 backgroundRepeat: "no-repeat",

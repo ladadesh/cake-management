@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import Loader from "../components/Loader";
 import { branches, cakeTypes, deliveryTypes } from "../constants/roles";
+import Slip from "../components/Slip";
 
 interface Slip {
   _id: string;
@@ -31,8 +32,6 @@ export default function SlipList() {
   const [selectedDateFilter, setSelectedDateFilter] = useState<
     "all" | "today" | "tomorrow"
   >("all");
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [previewSlip, setPreviewSlip] = useState<Slip | null>(null);
   const [showFilters, setShowFilters] = useState(true);
 
   // compute today's and tomorrow's dates for display next to branch buttons
@@ -86,16 +85,6 @@ export default function SlipList() {
     fetchSlips();
   }, []);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        closePreview();
-      }
-    };
-    if (previewUrl) window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [previewUrl]);
-
   const fetchSlips = async () => {
     setLoading(true);
     try {
@@ -108,17 +97,6 @@ export default function SlipList() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const openPreview = (url?: string | null, slip?: Slip | null) => {
-    if (!url) return; // don't open preview without a valid URL
-    setPreviewUrl(url);
-    setPreviewSlip(slip ?? null);
-  };
-
-  const closePreview = () => {
-    setPreviewUrl(null);
-    setPreviewSlip(null);
   };
 
   const filteredSlips = useMemo(() => {
@@ -342,151 +320,12 @@ export default function SlipList() {
           ) : (
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {filteredSlips.map((slip) => (
-                <li key={slip._id}>
-                  <div className="group bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
-                    {/* Image Section */}
-                    <div
-                      className="relative cursor-pointer"
-                      onClick={() => openPreview(slip.imageUrl, slip)}
-                    >
-                      <img
-                        src={slip.imageUrl || "/placeholder.png"}
-                        alt={`Slip for ${slip.branch}`}
-                        className="w-full h-40 object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                      <div className="absolute top-2 right-2 bg-white/80 text-gray-800 text-xs px-2 py-1 rounded-lg shadow-sm">
-                        #{slip.billNumber}
-                      </div>
-                    </div>
-
-                    {/* Info Section */}
-                    <div className="p-4">
-                      {/* Branch + Delivery Type */}
-                      <div className="flex justify-between items-center mb-3">
-                        <h3 className="text-lg font-semibold text-gray-800">
-                          {slip.branch?.toUpperCase() || "Branch"}
-                        </h3>
-                        <span
-                          className={`text-xs font-medium uppercase px-2 py-1 rounded-full ${
-                            slip.deliveryType === "delivery"
-                              ? "bg-orange-100 text-orange-700"
-                              : "bg-green-100 text-green-700"
-                          }`}
-                        >
-                          {slip.deliveryType}
-                        </span>
-                      </div>
-
-                      {/* Customer Info */}
-                      <div className="space-y-1 mb-3 flex justify-between">
-                        <p className="text-sm text-gray-700 font-medium">
-                          👤 {slip.customerName}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          📞 {slip.customerNumber}
-                        </p>
-                      </div>
-
-                      {/* Cake Details */}
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        <span className="bg-pink-100 text-pink-700 text-xs font-semibold px-2.5 py-1 rounded-full">
-                          {slip.cakeType} cake
-                        </span>
-                        <span
-                          className={`${
-                            slip.topper === "yes"
-                              ? "bg-purple-100 text-purple-700"
-                              : "bg-gray-100 text-gray-600"
-                          } text-xs font-semibold px-2.5 py-1 rounded-full`}
-                        >
-                          Topper: {slip.topper}
-                        </span>
-                        <span
-                          className={`${
-                            slip.hamper === "yes"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-gray-100 text-gray-600"
-                          } text-xs font-semibold px-2.5 py-1 rounded-full`}
-                        >
-                          Hamper: {slip.hamper}
-                        </span>
-                      </div>
-
-                      {/* Delivery Info */}
-                      <div className="flex justify-between items-center mt-4">
-                        <div>
-                          <p className="text-sm text-gray-700 font-medium">
-                            📅 {slip.deliveryDate}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            ⏰ {slip.deliveryTime}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </li>
+                <Slip slip={slip} key={slip._id} />
               ))}
             </ul>
           )}
         </div>
       </main>
-
-      {/* Preview Modal */}
-      {previewUrl && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        >
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={closePreview}
-            aria-hidden="true"
-          />
-
-          <div className="relative max-w-3xl w-full mx-auto bg-white rounded shadow-lg overflow-hidden">
-            <div className="flex justify-between items-center p-3 border-b">
-              <div>
-                <h4 className="font-semibold">Slip Preview</h4>
-                {previewSlip?.branch && (
-                  <p className="text-sm text-gray-500">{previewSlip.branch}</p>
-                )}
-              </div>
-              <button
-                onClick={closePreview}
-                className="p-2 rounded hover:bg-gray-100"
-                aria-label="Close preview"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-gray-700"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            <div className="p-4">
-              <img
-                src={previewUrl}
-                alt={
-                  previewSlip
-                    ? `Slip for ${previewSlip.branch}`
-                    : "Slip preview"
-                }
-                className="w-full h-[60vh] object-contain bg-gray-50"
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

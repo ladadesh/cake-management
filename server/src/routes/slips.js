@@ -3,6 +3,7 @@ import multer from "multer";
 import sharp from "sharp";
 import cloudinary from "../config/cloudinary.js";
 import Slip from "../models/Slip.js";
+import authMiddleware from "../middleware/auth.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -107,6 +108,36 @@ router.get("/", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to fetch slips." });
+  }
+});
+
+// PATCH /slips/:id/status to update a slip's status
+router.patch("/:id/status", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ error: "Status is required." });
+    }
+
+    const slip = await Slip.findById(id);
+
+    if (!slip) {
+      return res.status(404).json({ error: "Slip not found." });
+    }
+
+    slip.status = status;
+    const updatedSlip = await slip.save();
+
+    res.json({
+      success: true,
+      message: "Status updated successfully.",
+      slip: updatedSlip,
+    });
+  } catch (error) {
+    console.error("Error updating slip status:", error);
+    res.status(500).json({ error: "Failed to update slip status." });
   }
 });
 
