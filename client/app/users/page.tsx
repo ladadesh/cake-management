@@ -115,44 +115,80 @@ const UsersPage = () => {
   return (
     <div className="min-h-screen bg-pink-50 py-6 px-12">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">User Management</h1>
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full leading-normal">
-            <thead>
-              <tr className="bg-gray-100 text-left text-gray-600 uppercase text-sm">
-                <th className="px-5 py-3">Username</th>
-                <th className="px-5 py-3">Email</th>
-                <th className="px-5 py-3">Role</th>
-                <th className="px-5 py-3">Actions</th>
+
+      {/* Mobile View - Card List */}
+      <div className="md:hidden space-y-4">
+        {users.map((user) => (
+          <div key={user._id} className="bg-white p-4 rounded-lg shadow">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="font-bold text-gray-800">{user.username}</p>
+                <p className="text-sm text-gray-600">{user.email}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => handleEditClick(user)}
+                  className="text-pink-600 hover:text-pink-800 p-1"
+                  title="Edit User"
+                >
+                  <Edit size={18} />
+                </button>
+                <button
+                  onClick={() => handleDeleteClick(user)}
+                  className="text-pink-600 hover:text-pink-800 p-1"
+                  title="Delete User"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            </div>
+            <div className="mt-3 pt-3 border-t border-gray-200">
+              <span className="text-xs text-gray-500">Role: </span>
+              <span className="text-sm font-medium capitalize bg-pink-100 text-pink-700 px-2 py-1 rounded-full">
+                {user.role}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop View - Table */}
+      <div className="hidden md:block bg-white shadow-md rounded-lg overflow-hidden">
+        <table className="min-w-full leading-normal">
+          <thead>
+            <tr className="bg-gray-100 text-left text-gray-600 uppercase text-sm">
+              <th className="px-5 py-3">Username</th>
+              <th className="px-5 py-3">Email</th>
+              <th className="px-5 py-3">Role</th>
+              <th className="px-5 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user._id} className="border-b border-gray-200">
+                <td className="px-5 py-4 text-sm">{user.username}</td>
+                <td className="px-5 py-4 text-sm">{user.email}</td>
+                <td className="px-5 py-4 text-sm capitalize">{user.role}</td>
+                <td className="px-5 py-4 text-sm flex items-center gap-4">
+                  <button
+                    onClick={() => handleEditClick(user)}
+                    className="text-pink-600 hover:text-pink-800"
+                    title="Edit User"
+                  >
+                    <Edit size={18} />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteClick(user)}
+                    className="text-pink-600 hover:text-pink-800"
+                    title="Delete User"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user._id} className="border-b border-gray-200">
-                  <td className="px-5 py-4 text-sm">{user.username}</td>
-                  <td className="px-5 py-4 text-sm">{user.email}</td>
-                  <td className="px-5 py-4 text-sm capitalize">{user.role}</td>
-                  <td className="px-5 py-4 text-sm flex items-center gap-4">
-                    <button
-                      onClick={() => handleEditClick(user)}
-                      className="text-pink-600 hover:text-pink-800"
-                      title="Edit User"
-                    >
-                      <Edit size={18} />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteClick(user)}
-                      className="text-pink-600 hover:text-pink-800"
-                      title="Delete User"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <Modal isOpen={isModalOpen} onClose={handleModalClose} title="Edit User">

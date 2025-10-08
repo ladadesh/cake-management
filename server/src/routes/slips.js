@@ -111,28 +111,33 @@ router.get("/", async (req, res) => {
   }
 });
 
-// PATCH /slips/:id/status to update a slip's status
-router.patch("/:id/status", async (req, res) => {
+// PATCH /slips/:id to update a slip's status and/or notes
+router.patch("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, notes } = req.body;
 
-    if (!status) {
-      return res.status(400).json({ error: "Status is required." });
+    if (status === undefined && notes === undefined) {
+      return res
+        .status(400)
+        .json({ error: "Either status or notes is required." });
     }
 
-    const slip = await Slip.findById(id);
+    const updateData = {};
+    if (status !== undefined) updateData.status = status;
+    if (notes !== undefined) updateData.notes = notes;
 
-    if (!slip) {
+    const updatedSlip = await Slip.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
+
+    if (!updatedSlip) {
       return res.status(404).json({ error: "Slip not found." });
     }
 
-    slip.status = status;
-    const updatedSlip = await slip.save();
-
     res.json({
       success: true,
-      message: "Status updated successfully.",
+      message: "Slip updated successfully.",
       slip: updatedSlip,
     });
   } catch (error) {

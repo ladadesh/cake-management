@@ -15,6 +15,7 @@ const slipSchema = new mongoose.Schema({
   hamper: { type: String, required: false },
   topper: { type: String, required: false },
   status: { type: [String], default: ["pending"] },
+  notes: { type: String, required: false },
 });
 
 export default mongoose.model("Slip", slipSchema);

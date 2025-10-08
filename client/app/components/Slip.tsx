@@ -19,6 +19,7 @@ interface SlipInterface {
   topper?: string;
   status?: string | string[];
   deliveryMonth?: string;
+  notes?: string;
 }
 
 interface SlipProps {
@@ -31,6 +32,7 @@ const Slip = ({ slip }: SlipProps) => {
   const [currentStatus, setCurrentStatus] = useState<string[]>(
     Array.isArray(slip.status) ? slip.status : slip.status ? [slip.status] : []
   );
+  const [notes, setNotes] = useState(slip.notes || "");
 
   const allStatuses = [
     "pending",
@@ -40,25 +42,15 @@ const Slip = ({ slip }: SlipProps) => {
     "delivered",
   ];
 
-  const handleStatusChange = async (statusToToggle: string) => {
-    const isMultiSelectRole = role === "chef" || role === "staff";
-    let newStatuses: string[];
-
-    if (isMultiSelectRole) {
-      newStatuses = currentStatus.includes(statusToToggle)
-        ? currentStatus.filter((s) => s !== statusToToggle)
-        : [...currentStatus, statusToToggle];
-    } else {
-      newStatuses = [statusToToggle];
-    }
-
-    // Optimistically update the UI
-    setCurrentStatus(newStatuses);
+  const updateSlip = async (newStatus?: string[], newNotes?: string) => {
+    const payload: { status?: string[]; notes?: string } = {};
+    if (newStatus) payload.status = newStatus;
+    if (newNotes !== undefined) payload.notes = newNotes;
 
     try {
       await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/slips/${slip._id}/status`,
-        { status: newStatuses }
+        `${process.env.NEXT_PUBLIC_API_URL}/api/slips/${slip._id}`,
+        payload
       );
       // Optionally, you can show a success toast here
     } catch (error) {
@@ -69,9 +61,21 @@ const Slip = ({ slip }: SlipProps) => {
         : slip.status
         ? [slip.status]
         : [];
-      setCurrentStatus(originalStatus);
+      if (newStatus) setCurrentStatus(originalStatus);
+      if (newNotes !== undefined) setNotes(slip.notes || "");
       // Optionally, show an error toast
     }
+  };
+
+  const handleStatusChange = async (statusToToggle: string) => {
+    const isMultiSelectRole = role === "chef" || role === "staff";
+    const newStatuses = isMultiSelectRole
+      ? currentStatus.includes(statusToToggle)
+        ? currentStatus.filter((s) => s !== statusToToggle)
+        : [...currentStatus, statusToToggle]
+      : [statusToToggle];
+    setCurrentStatus(newStatuses); // Optimistic UI update
+    updateSlip(newStatuses);
   };
 
   useEffect(() => {
@@ -259,6 +263,33 @@ const Slip = ({ slip }: SlipProps) => {
                 Hamper: {slip.hamper}
               </span>
             </div>
+
+            {/* Notes Section */}
+            {(role === "admin" || role === "staff") && (
+              <div className="mt-3">
+                <label
+                  htmlFor={`notes-${slip._id}`}
+                  className="text-sm font-medium text-gray-600"
+                >
+                  Notes
+                </label>
+                <textarea
+                  id={`notes-${slip._id}`}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  onBlur={() => updateSlip(undefined, notes)}
+                  rows={2}
+                  className="w-full text-sm border rounded-md p-2 mt-1 bg-white text-gray-700 border-gray-300 focus:ring-2 focus:ring-pink-500"
+                  placeholder="Add notes..."
+                />
+              </div>
+            )}
+
+            {(role === "chef" || role === "delivery") && slip.notes && (
+              <p className="mt-3 text-sm bg-gray-50 p-2 rounded-md border border-gray-200">
+                <strong>Notes:</strong> {slip.notes}
+              </p>
+            )}
 
             {/* Delivery Info */}
             <div className="flex justify-between items-center mt-4">
