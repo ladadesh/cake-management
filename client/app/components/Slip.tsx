@@ -17,7 +17,7 @@ interface SlipInterface {
   cakeType?: string;
   hamper?: string;
   topper?: string;
-  status?: string;
+  status?: string | string[];
 }
 
 interface SlipProps {
@@ -27,7 +27,9 @@ const Slip = ({ slip }: SlipProps) => {
   const { role } = useUser();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewSlip, setPreviewSlip] = useState<SlipInterface | null>(null);
-  const [currentStatus, setCurrentStatus] = useState(slip.status);
+  const [currentStatus, setCurrentStatus] = useState<string[]>(
+    Array.isArray(slip.status) ? slip.status : slip.status ? [slip.status] : []
+  );
 
   const allStatuses = [
     "pending",
@@ -37,20 +39,36 @@ const Slip = ({ slip }: SlipProps) => {
     "delivered",
   ];
 
-  const handleStatusChange = async (newStatus: string) => {
+  const handleStatusChange = async (statusToToggle: string) => {
+    const isMultiSelectRole = role === "chef" || role === "staff";
+    let newStatuses: string[];
+
+    if (isMultiSelectRole) {
+      newStatuses = currentStatus.includes(statusToToggle)
+        ? currentStatus.filter((s) => s !== statusToToggle)
+        : [...currentStatus, statusToToggle];
+    } else {
+      newStatuses = [statusToToggle];
+    }
+
     // Optimistically update the UI
-    setCurrentStatus(newStatus);
+    setCurrentStatus(newStatuses);
 
     try {
       await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/slips/${slip._id}/status`,
-        { status: newStatus }
+        { status: newStatuses }
       );
       // Optionally, you can show a success toast here
     } catch (error) {
       console.error("Failed to update status:", error);
       // Revert the change on error
-      setCurrentStatus(slip.status);
+      const originalStatus = Array.isArray(slip.status)
+        ? slip.status
+        : slip.status
+        ? [slip.status]
+        : [];
+      setCurrentStatus(originalStatus);
       // Optionally, show an error toast
     }
   };
@@ -74,12 +92,25 @@ const Slip = ({ slip }: SlipProps) => {
     setPreviewSlip(slip ?? null);
   };
 
+  const getAdminSelectedStatus = (statuses: string[]): string => {
+    if (!statuses || statuses.length === 0) {
+      return "pending";
+    }
+
+    const lastStatus = allStatuses
+      .slice()
+      .reverse()
+      .find((status) => statuses.includes(status));
+
+    return lastStatus || "pending";
+  };
+
   const renderStatusControls = (userRole: UserRole) => {
     switch (userRole) {
       case "admin":
         return (
           <select
-            value={currentStatus}
+            value={getAdminSelectedStatus(currentStatus)}
             onChange={(e) => handleStatusChange(e.target.value)}
             className="text-sm border rounded-md p-1 bg-white text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
           >
@@ -96,7 +127,7 @@ const Slip = ({ slip }: SlipProps) => {
             <label className="flex items-center gap-1">
               <input
                 type="checkbox"
-                checked={currentStatus === "in kitchen"}
+                checked={currentStatus.includes("in kitchen")}
                 onChange={() => handleStatusChange("in kitchen")}
               />
               In Kitchen
@@ -104,7 +135,7 @@ const Slip = ({ slip }: SlipProps) => {
             <label className="flex items-center gap-1">
               <input
                 type="checkbox"
-                checked={currentStatus === "ready"}
+                checked={currentStatus.includes("ready")}
                 onChange={() => handleStatusChange("ready")}
               />
               Ready
@@ -117,7 +148,7 @@ const Slip = ({ slip }: SlipProps) => {
             <label className="flex items-center gap-1">
               <input
                 type="checkbox"
-                checked={currentStatus === "in store"}
+                checked={currentStatus.includes("in store")}
                 onChange={() => handleStatusChange("in store")}
               />
               In Store
@@ -125,7 +156,7 @@ const Slip = ({ slip }: SlipProps) => {
             <label className="flex items-center gap-1">
               <input
                 type="checkbox"
-                checked={currentStatus === "delivered"}
+                checked={currentStatus.includes("delivered")}
                 onChange={() => handleStatusChange("delivered")}
               />
               Delivered
@@ -138,7 +169,7 @@ const Slip = ({ slip }: SlipProps) => {
             <label className="flex items-center gap-1">
               <input
                 type="checkbox"
-                checked={currentStatus === "delivered"}
+                checked={currentStatus.includes("delivered")}
                 onChange={() => handleStatusChange("delivered")}
               />
               Delivered
@@ -148,7 +179,7 @@ const Slip = ({ slip }: SlipProps) => {
       default:
         return (
           <span className="text-sm font-medium capitalize">
-            {currentStatus}
+            {currentStatus.join(", ")}
           </span>
         );
     }
@@ -192,12 +223,16 @@ const Slip = ({ slip }: SlipProps) => {
             </div>
 
             {/* Customer Info */}
-            <div className="space-y-1 mb-3 flex justify-between">
-              <p className="text-sm text-gray-700 font-medium">
-                👤 {slip.customerName}
-              </p>
-              <p className="text-sm text-gray-600">📞 {slip.customerNumber}</p>
-            </div>
+            {role !== "chef" && (
+              <div className="space-y-1 mb-3 flex justify-between">
+                <p className="text-sm text-gray-700 font-medium">
+                  👤 {slip.customerName}
+                </p>
+                <p className="text-sm text-gray-600">
+                  📞 {slip.customerNumber}
+                </p>
+              </div>
+            )}
 
             {/* Cake Details */}
             <div className="flex flex-wrap gap-2 mb-3">

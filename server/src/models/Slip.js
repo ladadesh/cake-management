@@ -14,7 +14,7 @@ const slipSchema = new mongoose.Schema({
   billNumber: { type: String, required: false },
   hamper: { type: String, required: false },
   topper: { type: String, required: false },
-  status: { type: String, default: "pending" },
+  status: { type: [String], default: ["pending"] },
 });
 
 export default mongoose.model("Slip", slipSchema);
