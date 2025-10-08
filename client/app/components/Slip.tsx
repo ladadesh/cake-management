@@ -18,6 +18,7 @@ interface SlipInterface {
   hamper?: string;
   topper?: string;
   status?: string | string[];
+  deliveryMonth?: string;
 }
 
 interface SlipProps {
@@ -237,7 +238,7 @@ const Slip = ({ slip }: SlipProps) => {
             {/* Cake Details */}
             <div className="flex flex-wrap gap-2 mb-3">
               <span className="bg-pink-100 text-pink-700 text-xs font-semibold px-2.5 py-1 rounded-full">
-                {slip.cakeType} cake
+                {slip.cakeType}
               </span>
               <span
                 className={`${
@@ -263,7 +264,7 @@ const Slip = ({ slip }: SlipProps) => {
             <div className="flex justify-between items-center mt-4">
               <div>
                 <p className="text-sm text-gray-700 font-medium">
-                  📅 {slip.deliveryDate}
+                  📅 {slip.deliveryDate} - {slip.deliveryMonth}
                 </p>
                 <p className="text-sm text-gray-500">⏰ {slip.deliveryTime}</p>
               </div>

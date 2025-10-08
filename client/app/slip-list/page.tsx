@@ -18,6 +18,7 @@ interface Slip {
   cakeType?: string;
   topper?: string;
   hamper?: string;
+  deliveryMonth?: string;
 }
 
 export default function SlipList() {
@@ -66,8 +67,8 @@ export default function SlipList() {
 
   // helper: produce local YYYY-MM-DD and HH:MM (local time) rather than using toISOString (UTC)
   const formatLocalIso = (d: Date) =>
-    `${d.getDate()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
-      d.getFullYear()
+    `${String(d.getDate()).padStart(2, "0")}-${String(
+      d.getMonth() + 1
     ).padStart(2, "0")}`;
 
   // compute ISO-like local date strings to compare with slips stored dates (YYYY-MM-DD)
@@ -127,12 +128,15 @@ export default function SlipList() {
       }
 
       // date filter: if selected, compare slip.deliveryDate (stored as YYYY-MM-DD)
+      const slipDate = `${s.deliveryDate}-${s.deliveryMonth}`;
       if (selectedDateFilter === "today") {
-        if (String(s.deliveryDate || "").slice(0, 10) !== todayIso)
+        if (slipDate !== todayIso) {
           return false;
+        }
       } else if (selectedDateFilter === "tomorrow") {
-        if (String(s.deliveryDate || "").slice(0, 10) !== tomorrowIso)
+        if (slipDate !== tomorrowIso) {
           return false;
+        }
       }
 
       if (!q) return true;
