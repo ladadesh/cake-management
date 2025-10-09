@@ -55,8 +55,8 @@ const SlipTableRow = ({ filteredSlips }: SlipTableRowProps) => {
             <th className="px-5 py-3 font-semibold">Branch</th>
             <th className="px-5 py-3 font-semibold">Customer</th>
             <th className="px-5 py-3 font-semibold">Number</th>
-            <th className="px-5 py-3 font-semibold">Delivery</th>
-            <th className="px-5 py-3 font-semibold">Type</th>
+            <th className="px-5 py-3 font-semibold">Time</th>
+            <th className="px-5 py-3 font-semibold">Delivery/Pickup</th>
             <th className="px-5 py-3 font-semibold">Cake</th>
             <th className="px-5 py-3 font-semibold">Hamper</th>
           </tr>
@@ -92,22 +92,23 @@ const SlipTableRow = ({ filteredSlips }: SlipTableRowProps) => {
               <td
                 className="px-5 py-3 text-sm block md:table-cell"
                 data-label="Number"
+                onClick={(e) => e.stopPropagation()}
               >
                 <span className="font-bold md:hidden">Number: </span>
                 {slip.customerNumber}
               </td>
               <td
                 className="px-5 py-3 text-sm block md:table-cell"
-                data-label="Delivery"
+                data-label="Time"
               >
-                <span className="font-bold md:hidden">Delivery: </span>
+                <span className="font-bold md:hidden">Time: </span>
                 {slip.deliveryDate}-{slip.deliveryMonth} at {slip.deliveryTime}
               </td>
               <td
                 className="px-5 py-3 text-sm capitalize block md:table-cell"
-                data-label="Type"
+                data-label="Pickup/Delivery"
               >
-                <span className="font-bold md:hidden">Type: </span>
+                <span className="font-bold md:hidden">Pickup/Delivery: </span>
                 {slip.deliveryType}
               </td>
               <td

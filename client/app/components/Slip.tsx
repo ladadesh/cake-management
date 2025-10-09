@@ -279,7 +279,7 @@ const Slip = ({ slip }: SlipProps) => {
                   onChange={(e) => setNotes(e.target.value)}
                   onBlur={() => updateSlip(undefined, notes)}
                   rows={2}
-                  className="w-full text-sm border rounded-md p-2 mt-1 bg-white text-gray-700 border-gray-300 focus:ring-2 focus:ring-pink-500"
+                  className="w-full text-sm border rounded-md p-2 mt-1 bg-white text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
                   placeholder="Add notes..."
                 />
               </div>

@@ -35,9 +35,10 @@ export default function SlipList() {
   >(null);
   const [selectedCakeType, setSelectedCakeType] = useState<string | null>(null);
   const [selectedDateFilter, setSelectedDateFilter] = useState<
-    "all" | "today" | "tomorrow"
-  >("all");
+    "today" | "tomorrow" | null
+  >("today");
   const [showFilters, setShowFilters] = useState(true);
+  const [customDate, setCustomDate] = useState("");
   const [viewMode, setViewMode] = useState<"card" | "table">("card");
 
   // compute today's and tomorrow's dates for display next to branch buttons
@@ -87,6 +88,18 @@ export default function SlipList() {
     return formatLocalIso(d);
   }, [tomorrow]);
 
+  const minDate = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 5);
+    return d.toISOString().split("T")[0];
+  }, []);
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const date = e.target.value;
+    setCustomDate(date);
+    setSelectedDateFilter(null); // Deselect today/tomorrow if a custom date is chosen
+  };
+
   useEffect(() => {
     fetchSlips();
   }, []);
@@ -133,14 +146,23 @@ export default function SlipList() {
       }
 
       // date filter: if selected, compare slip.deliveryDate (stored as YYYY-MM-DD)
-      const slipDate = `${s.deliveryDate}-${s.deliveryMonth}`;
-      if (selectedDateFilter === "today") {
-        if (slipDate !== todayIso) {
+      if (customDate) {
+        const [year, month, day] = customDate.split("-");
+        const formattedCustomDate = `${day}-${month}`;
+        const slipDate = `${s.deliveryDate}-${s.deliveryMonth}`;
+        if (slipDate !== formattedCustomDate) {
           return false;
         }
-      } else if (selectedDateFilter === "tomorrow") {
-        if (slipDate !== tomorrowIso) {
-          return false;
+      } else {
+        const slipDate = `${s.deliveryDate}-${s.deliveryMonth}`;
+        if (selectedDateFilter === "today") {
+          if (slipDate !== todayIso) {
+            return false;
+          }
+        } else if (selectedDateFilter === "tomorrow") {
+          if (slipDate !== tomorrowIso) {
+            return false;
+          }
         }
       }
 
@@ -174,6 +196,7 @@ export default function SlipList() {
     selectedDeliveryType,
     selectedCakeType,
     selectedDateFilter,
+    customDate,
     todayIso,
     tomorrowIso,
   ]);
@@ -188,138 +211,157 @@ export default function SlipList() {
 
       {/* Top: sticky header / controls */}
       <div className="backdrop-blur-sm border-b relative pt-4">
-        <div className="px-3 mx-4 mb-2 flex justify-end">
-          {(role === "admin" || role === "staff") && (
-            <div className="flex items-center gap-2 border border-pink-400 rounded-md p-1">
-              <button
-                onClick={() => setViewMode("card")}
-                className={`p-1 rounded-md ${
-                  viewMode === "card"
-                    ? "bg-pink-500 text-white"
-                    : "text-gray-600 hover:bg-pink-100"
-                }`}
-                aria-label="Card View"
-              >
-                <List size={20} />
-              </button>
-              <button
-                onClick={() => setViewMode("table")}
-                className={`p-1 rounded-md ${
-                  viewMode === "table"
-                    ? "bg-pink-500 text-white"
-                    : "text-gray-600 hover:bg-pink-100"
-                }`}
-                aria-label="Table View"
-              >
-                <Table size={20} />
-              </button>
-            </div>
-          )}
-        </div>
         {showFilters && (
-          <div className="px-3 mx-4">
-            {branches?.length > 0 && (
-              <div className="flex items-center justify-between gap-3 flex-col md:flex-row sm:flex-row">
-                <div className="flex items-center gap-3">
-                  <div className="flex flex-wrap gap-3">
-                    <select
-                      onChange={(e) => setSelectedBranch(e.target.value)}
-                      value={selectedBranch || "all"}
-                      className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-white text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
-                    >
-                      <option value="all">All Branches</option>
-                      {branches.map((b) => (
-                        <option key={b.id} value={b.id.toLowerCase()}>
-                          {b.name.toUpperCase()}
-                        </option>
-                      ))}
-                    </select>
+          <>
+            <div className="px-3 mx-4 mb-2 flex justify-end">
+              {(role === "admin" || role === "staff") && (
+                <div className="flex items-center gap-2 border border-pink-400 rounded-md p-1">
+                  <button
+                    onClick={() => setViewMode("card")}
+                    className={`p-1 rounded-md ${
+                      viewMode === "card"
+                        ? "bg-pink-500 text-white"
+                        : "text-gray-600 hover:bg-pink-100"
+                    }`}
+                    aria-label="Card View"
+                  >
+                    <Table size={20} />
+                  </button>
+                  <button
+                    onClick={() => setViewMode("table")}
+                    className={`p-1 rounded-md ${
+                      viewMode === "table"
+                        ? "bg-pink-500 text-white"
+                        : "text-gray-600 hover:bg-pink-100"
+                    }`}
+                    aria-label="Table View"
+                  >
+                    <List size={20} />
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="px-3 mx-4">
+              {branches?.length > 0 && (
+                <div className="flex items-center justify-between gap-3 flex-col md:flex-row sm:flex-row">
+                  <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap gap-3">
+                      <select
+                        onChange={(e) => setSelectedBranch(e.target.value)}
+                        value={selectedBranch || "all"}
+                        className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-white text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                      >
+                        <option value="all">All Branches</option>
+                        {branches.map((b) => (
+                          <option key={b.id} value={b.id.toLowerCase()}>
+                            {b.name.toUpperCase()}
+                          </option>
+                        ))}
+                      </select>
 
-                    <select
-                      onChange={(e) => setSelectedDeliveryType(e.target.value)}
-                      value={selectedDeliveryType || "all"}
-                      className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-white text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
-                    >
-                      <option value="all">Delivery Type</option>
-                      {deliveryTypes.map((b) => (
-                        <option key={b.id} value={b.id.toLowerCase()}>
-                          {b.name.toUpperCase()}
-                        </option>
-                      ))}
-                    </select>
+                      <select
+                        onChange={(e) =>
+                          setSelectedDeliveryType(e.target.value)
+                        }
+                        value={selectedDeliveryType || "all"}
+                        className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-white text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                      >
+                        <option value="all">Delivery Type</option>
+                        {deliveryTypes.map((b) => (
+                          <option key={b.id} value={b.id.toLowerCase()}>
+                            {b.name.toUpperCase()}
+                          </option>
+                        ))}
+                      </select>
 
-                    <select
-                      onChange={(e) => setSelectedCakeType(e.target.value)}
-                      value={selectedCakeType || "all"}
-                      className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-white text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
-                    >
-                      <option value="all">Cake Type</option>
-                      {cakeTypes.map((b) => (
-                        <option key={b.id} value={b.id.toLowerCase()}>
-                          {b.name.toUpperCase()}
-                        </option>
-                      ))}
-                    </select>
+                      <select
+                        onChange={(e) => setSelectedCakeType(e.target.value)}
+                        value={selectedCakeType || "all"}
+                        className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-white text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                      >
+                        <option value="all">Cake Type</option>
+                        {cakeTypes.map((b) => (
+                          <option key={b.id} value={b.id.toLowerCase()}>
+                            {b.name.toUpperCase()}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="w-72 sm:my-2">
+                    <input
+                      aria-label="Search slips"
+                      className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-white text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                      placeholder="Search by name, number, bill, etc..."
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    {role === "chef" ? (
+                      <div className="flex-1 flex flex-wrap gap-3">
+                        <button
+                          onClick={() => {
+                            setSelectedDateFilter("today");
+                            setCustomDate("");
+                          }}
+                          className={`px-3 py-2 border rounded-md text-sm ${
+                            selectedDateFilter === "today" && !customDate
+                              ? "bg-pink-500 text-white border-pink-500"
+                              : "bg-white text-gray-700 border-pink-400"
+                          }`}
+                        >
+                          Today: {formatShortDate(today)}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedDateFilter("tomorrow");
+                            setCustomDate("");
+                          }}
+                          className={`px-3 py-2 border rounded-md text-sm ${
+                            selectedDateFilter === "tomorrow" && !customDate
+                              ? "bg-pink-500 text-white border-pink-500"
+                              : "bg-white text-gray-700 border-pink-400"
+                          }`}
+                        >
+                          Tomorrow: {formatShortDate(tomorrow)}
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex-1 flex flex-wrap items-center gap-3">
+                        <button
+                          onClick={() => {
+                            setSelectedDateFilter("today");
+                            setCustomDate("");
+                          }}
+                          className={`px-3 py-2 border rounded-md text-sm ${
+                            selectedDateFilter === "today" && !customDate
+                              ? "bg-pink-500 text-white border-pink-500"
+                              : "bg-white text-gray-700 border-pink-400"
+                          }`}
+                        >
+                          Today: {formatShortDate(today)}
+                        </button>
+                        <input
+                          type="date"
+                          value={customDate}
+                          onChange={handleDateChange}
+                          min={minDate}
+                          className={`px-3 py-1.5 border rounded-md text-sm focus:outline-none  border-pink-400 focus:ring-2 focus:ring-pink-500 ${
+                            customDate
+                              ? "bg-pink-500 text-white border-pink-500"
+                              : "bg-white text-gray-700"
+                          }`}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
-
-                <div className="w-72 sm:my-2">
-                  <input
-                    aria-label="Search slips"
-                    className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-white text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
-                    placeholder="Search by name, number, bill, etc..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                  />
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 flex flex-wrap gap-3">
-                    <button
-                      onClick={() => setSelectedDateFilter("all")}
-                      className={`px-3 py-2 border rounded-md text-sm ${
-                        selectedDateFilter === "all"
-                          ? "bg-pink-500 text-white border-pink-500"
-                          : "bg-white text-gray-700 border-pink-400"
-                      }`}
-                    >
-                      All
-                    </button>
-
-                    <button
-                      onClick={() =>
-                        setSelectedDateFilter(
-                          selectedDateFilter === "today" ? "all" : "today"
-                        )
-                      }
-                      className={`px-3 py-2 border rounded-md text-sm ${
-                        selectedDateFilter === "today"
-                          ? "bg-pink-500 text-white border-pink-500"
-                          : "bg-white text-gray-700 border-pink-400"
-                      }`}
-                    >
-                      Today: {formatShortDate(today)}
-                    </button>
-
-                    <button
-                      onClick={() =>
-                        setSelectedDateFilter(
-                          selectedDateFilter === "tomorrow" ? "all" : "tomorrow"
-                        )
-                      }
-                      className={`px-3 py-2 border rounded-md text-sm ${
-                        selectedDateFilter === "tomorrow"
-                          ? "bg-pink-500 text-white border-pink-500"
-                          : "bg-white text-gray-700 border-pink-400"
-                      }`}
-                    >
-                      Tomorrow: {formatShortDate(tomorrow)}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          </>
         )}
         <div className="flex justify-center w-full mt-1">
           <button
