@@ -1,9 +1,12 @@
 "use client";
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
+import { List, Table } from "lucide-react";
 import Loader from "../components/Loader";
 import { branches, cakeTypes, deliveryTypes } from "../constants/roles";
 import Slip from "../components/Slip";
+import { useUser } from "../hooks/useUser";
+import SlipTableRow from "../components/SlipTableRow";
 
 interface Slip {
   _id: string;
@@ -22,6 +25,7 @@ interface Slip {
 }
 
 export default function SlipList() {
+  const { role } = useUser();
   const [slips, setSlips] = useState<Slip[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -34,6 +38,7 @@ export default function SlipList() {
     "all" | "today" | "tomorrow"
   >("all");
   const [showFilters, setShowFilters] = useState(true);
+  const [viewMode, setViewMode] = useState<"card" | "table">("card");
 
   // compute today's and tomorrow's dates for display next to branch buttons
   const today = useMemo(() => new Date(), []);
@@ -182,7 +187,35 @@ export default function SlipList() {
       )}
 
       {/* Top: sticky header / controls */}
-      <div className="backdrop-blur-sm border-b relative">
+      <div className="backdrop-blur-sm border-b relative pt-4">
+        <div className="px-3 mx-4 mb-2 flex justify-end">
+          {(role === "admin" || role === "staff") && (
+            <div className="flex items-center gap-2 border border-pink-400 rounded-md p-1">
+              <button
+                onClick={() => setViewMode("card")}
+                className={`p-1 rounded-md ${
+                  viewMode === "card"
+                    ? "bg-pink-500 text-white"
+                    : "text-gray-600 hover:bg-pink-100"
+                }`}
+                aria-label="Card View"
+              >
+                <List size={20} />
+              </button>
+              <button
+                onClick={() => setViewMode("table")}
+                className={`p-1 rounded-md ${
+                  viewMode === "table"
+                    ? "bg-pink-500 text-white"
+                    : "text-gray-600 hover:bg-pink-100"
+                }`}
+                aria-label="Table View"
+              >
+                <Table size={20} />
+              </button>
+            </div>
+          )}
+        </div>
         {showFilters && (
           <div className="px-3 mx-4">
             {branches?.length > 0 && (
@@ -322,11 +355,19 @@ export default function SlipList() {
           {filteredSlips.length === 0 ? (
             <p className="text-gray-500">No slips found.</p>
           ) : (
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {filteredSlips.map((slip) => (
-                <Slip slip={slip} key={slip._id} />
-              ))}
-            </ul>
+            <>
+              {viewMode === "card" ? (
+                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {filteredSlips.map((slip) => (
+                    <Slip slip={slip} key={slip._id} />
+                  ))}
+                </ul>
+              ) : (
+                <div className="bg-white shadow-md rounded-lg">
+                  <SlipTableRow filteredSlips={filteredSlips} />
+                </div>
+              )}
+            </>
           )}
         </div>
       </main>

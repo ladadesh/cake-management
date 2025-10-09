@@ -109,8 +109,8 @@ export default function UploadSlip() {
       setCustomerName("");
       setCustomerPhone("");
       setCakeType("");
-      setHamper("");
-      setTopper("");
+      setHamper("no");
+      setTopper("no");
     } catch (error) {
       console.error("Upload request error:", error);
       // For now we just log. Could set an error state to show to the user.
