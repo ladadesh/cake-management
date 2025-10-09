@@ -36,7 +36,7 @@ export default function SlipList() {
   const [selectedCakeType, setSelectedCakeType] = useState<string | null>(null);
   const [selectedDateFilter, setSelectedDateFilter] = useState<
     "today" | "tomorrow" | null
-  >("today");
+  >("today"); // Default to today
   const [showFilters, setShowFilters] = useState(true);
   const [customDate, setCustomDate] = useState("");
   const [viewMode, setViewMode] = useState<"card" | "table">("card");
@@ -71,23 +71,6 @@ export default function SlipList() {
     return `${day} ${month}`;
   };
 
-  // helper: produce local YYYY-MM-DD and HH:MM (local time) rather than using toISOString (UTC)
-  const formatLocalIso = (d: Date) =>
-    `${String(d.getDate()).padStart(2, "0")}-${String(
-      d.getMonth() + 1
-    ).padStart(2, "0")}`;
-
-  // compute ISO-like local date strings to compare with slips stored dates (YYYY-MM-DD)
-  const todayIso = useMemo(() => {
-    const d = new Date(today);
-    return formatLocalIso(d);
-  }, [today]);
-
-  const tomorrowIso = useMemo(() => {
-    const d = new Date(tomorrow);
-    return formatLocalIso(d);
-  }, [tomorrow]);
-
   const minDate = useMemo(() => {
     const d = new Date();
     d.setDate(d.getDate() - 5);
@@ -100,15 +83,45 @@ export default function SlipList() {
     setSelectedDateFilter(null); // Deselect today/tomorrow if a custom date is chosen
   };
 
-  useEffect(() => {
-    fetchSlips();
-  }, []);
+  // Determine the date to fetch based on the filter state
+  const dateToFetch = useMemo(() => {
+    if (customDate) {
+      return customDate;
+    }
+    if (selectedDateFilter === "today") {
+      const d = new Date(today);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+    if (selectedDateFilter === "tomorrow") {
+      const d = new Date(tomorrow);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+    return null;
+  }, [customDate, selectedDateFilter, today, tomorrow]);
 
-  const fetchSlips = async () => {
+  useEffect(() => {
+    if (dateToFetch) {
+      fetchSlips(dateToFetch);
+    } else {
+      // Handle case where no date is selected, maybe fetch all or none
+      setSlips([]);
+    }
+  }, [dateToFetch]);
+
+  const fetchSlips = async (date: string) => {
     setLoading(true);
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/slips`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/slips`,
+        {
+          params: { date },
+        }
       );
       setSlips(res.data || []);
     } catch (err) {
@@ -145,27 +158,6 @@ export default function SlipList() {
         }
       }
 
-      // date filter: if selected, compare slip.deliveryDate (stored as YYYY-MM-DD)
-      if (customDate) {
-        const [year, month, day] = customDate.split("-");
-        const formattedCustomDate = `${day}-${month}`;
-        const slipDate = `${s.deliveryDate}-${s.deliveryMonth}`;
-        if (slipDate !== formattedCustomDate) {
-          return false;
-        }
-      } else {
-        const slipDate = `${s.deliveryDate}-${s.deliveryMonth}`;
-        if (selectedDateFilter === "today") {
-          if (slipDate !== todayIso) {
-            return false;
-          }
-        } else if (selectedDateFilter === "tomorrow") {
-          if (slipDate !== tomorrowIso) {
-            return false;
-          }
-        }
-      }
-
       if (!q) return true;
 
       return (
@@ -189,17 +181,7 @@ export default function SlipList() {
           .includes(q)
       );
     });
-  }, [
-    search,
-    slips,
-    selectedBranch,
-    selectedDeliveryType,
-    selectedCakeType,
-    selectedDateFilter,
-    customDate,
-    todayIso,
-    tomorrowIso,
-  ]);
+  }, [search, slips, selectedBranch, selectedDeliveryType, selectedCakeType]);
 
   return (
     <div className="h-screen flex flex-col bg-pink-50 ">
