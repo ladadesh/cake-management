@@ -1,8 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useUser } from "../hooks/useUser";
-import { UserRole } from "../constants/roles";
 
 interface SlipInterface {
   _id: string;
