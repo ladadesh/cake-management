@@ -82,6 +82,7 @@ router.get("/", async (req, res) => {
       deliveryType,
       cakeType,
       deliveryDate,
+      date, // The new date filter from the client
       customerName,
       customerNumber,
       billNumber,
@@ -92,8 +93,13 @@ router.get("/", async (req, res) => {
     if (branch) filters.branch = branch;
     if (deliveryType) filters.deliveryType = deliveryType;
     if (cakeType) filters.cakeType = cakeType;
-    if (deliveryDate)
-      filters.deliveryDate = { $regex: deliveryDate, $options: "i" };
+    if (date) {
+      // date is in 'YYYY-MM-DD' format from the client
+      const [year, month, day] = date.split("-");
+      filters.deliveryDate = day;
+      filters.deliveryMonth = month;
+    } else if (deliveryDate)
+      filters.deliveryDate = { $regex: deliveryDate, $options: "i" }; // Keep old behavior if new 'date' param is not used
     if (customerName)
       filters.customerName = { $regex: customerName, $options: "i" };
     if (customerNumber)
