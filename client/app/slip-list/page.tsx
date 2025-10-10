@@ -192,105 +192,22 @@ export default function SlipList() {
       )}
 
       {/* Top: sticky header / controls */}
-      <div className="backdrop-blur-sm border-b relative pt-4">
+      <div className="backdrop-blur-sm border-b relative pt-1">
         {showFilters && (
           <>
-            <div className="px-3 mx-4 mb-2 flex justify-end">
-              {(role === "admin" || role === "staff") && (
-                <div className="flex items-center gap-2 border border-pink-400 rounded-md p-1">
-                  <button
-                    onClick={() => setViewMode("card")}
-                    className={`p-1 rounded-md ${
-                      viewMode === "card"
-                        ? "bg-pink-500 text-white"
-                        : "text-gray-600 hover:bg-pink-100"
-                    }`}
-                    aria-label="Card View"
-                  >
-                    <Table size={20} />
-                  </button>
-                  <button
-                    onClick={() => setViewMode("table")}
-                    className={`p-1 rounded-md ${
-                      viewMode === "table"
-                        ? "bg-pink-500 text-white"
-                        : "text-gray-600 hover:bg-pink-100"
-                    }`}
-                    aria-label="Table View"
-                  >
-                    <List size={20} />
-                  </button>
-                </div>
-              )}
-            </div>
-            <div className="px-3 mx-4">
-              {branches?.length > 0 && (
-                <div className="flex items-center justify-between gap-3 flex-col md:flex-row sm:flex-row">
-                  <div className="flex items-center gap-3">
-                    <div className="flex flex-wrap gap-3">
-                      <select
-                        onChange={(e) => setSelectedBranch(e.target.value)}
-                        value={selectedBranch || "all"}
-                        className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-white text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
-                      >
-                        <option value="all">All Branches</option>
-                        {branches.map((b) => (
-                          <option key={b.id} value={b.id.toLowerCase()}>
-                            {b.name.toUpperCase()}
-                          </option>
-                        ))}
-                      </select>
-
-                      <select
-                        onChange={(e) =>
-                          setSelectedDeliveryType(e.target.value)
-                        }
-                        value={selectedDeliveryType || "all"}
-                        className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-white text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
-                      >
-                        <option value="all">Delivery Type</option>
-                        {deliveryTypes.map((b) => (
-                          <option key={b.id} value={b.id.toLowerCase()}>
-                            {b.name.toUpperCase()}
-                          </option>
-                        ))}
-                      </select>
-
-                      <select
-                        onChange={(e) => setSelectedCakeType(e.target.value)}
-                        value={selectedCakeType || "all"}
-                        className="px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-white text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
-                      >
-                        <option value="all">Cake Type</option>
-                        {cakeTypes.map((b) => (
-                          <option key={b.id} value={b.id.toLowerCase()}>
-                            {b.name.toUpperCase()}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="w-72 sm:my-2">
-                    <input
-                      aria-label="Search slips"
-                      className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none bg-white text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
-                      placeholder="Search by name, number, bill, etc..."
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="flex items-center gap-3">
+            <div className="px-4 py-2">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div className="flex flex-col md:flex-row md:items-center gap-4 w-full">
+                  <div className="flex flex-wrap items-center gap-2">
                     {role === "chef" ? (
-                      <div className="flex-1 flex flex-wrap gap-3">
+                      <div className="flex-1 flex gap-3">
                         <button
                           onClick={() => {
                             setSelectedDateFilter("today");
                             setCustomDate("");
                           }}
-                          className={`px-3 py-2 border rounded-md text-sm ${
-                            selectedDateFilter === "today" && !customDate
+                          className={`px-3 py-2 border rounded-md text-sm height-34px w-max ${
+                            selectedDateFilter === "today"
                               ? "bg-pink-500 text-white border-pink-500"
                               : "bg-white text-gray-700 border-pink-400"
                           }`}
@@ -302,8 +219,8 @@ export default function SlipList() {
                             setSelectedDateFilter("tomorrow");
                             setCustomDate("");
                           }}
-                          className={`px-3 py-2 border rounded-md text-sm ${
-                            selectedDateFilter === "tomorrow" && !customDate
+                          className={`px-3 py-2 border rounded-md text-sm height-34px w-max ${
+                            selectedDateFilter === "tomorrow"
                               ? "bg-pink-500 text-white border-pink-500"
                               : "bg-white text-gray-700 border-pink-400"
                           }`}
@@ -312,13 +229,13 @@ export default function SlipList() {
                         </button>
                       </div>
                     ) : (
-                      <div className="flex-1 flex flex-wrap items-center gap-3">
+                      <div className="flex items-center gap-2">
                         <button
                           onClick={() => {
                             setSelectedDateFilter("today");
                             setCustomDate("");
                           }}
-                          className={`px-3 py-2 border rounded-md text-sm ${
+                          className={`px-3 py-2 border rounded-md text-sm height-34px w-max ${
                             selectedDateFilter === "today" && !customDate
                               ? "bg-pink-500 text-white border-pink-500"
                               : "bg-white text-gray-700 border-pink-400"
@@ -340,8 +257,94 @@ export default function SlipList() {
                       </div>
                     )}
                   </div>
+
+                  <div className="w-full md:w-72">
+                    <input
+                      aria-label="Search slips"
+                      className="w-full px-2 py-2 border rounded-md shadow-sm focus:outline-none bg-white height-34px text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                      placeholder="Search by name, number, bill, branch..."
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                    <div className="flex-1">
+                      <select
+                        onChange={(e) => setSelectedBranch(e.target.value)}
+                        value={selectedBranch || "all"}
+                        className="w-full px-3 py-1 border rounded-md shadow-sm focus:outline-none bg-white height-34px text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500 height-34px"
+                      >
+                        <option value="all">All Branches</option>
+                        {branches.map((b) => (
+                          <option key={b.id} value={b.id.toLowerCase()}>
+                            {b.name.toUpperCase()}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex-1">
+                      <select
+                        onChange={(e) =>
+                          setSelectedDeliveryType(e.target.value)
+                        }
+                        value={selectedDeliveryType || "all"}
+                        className="w-full px-3 py-1 border rounded-md shadow-sm focus:outline-none bg-white height-34px text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                      >
+                        <option value="all">Delivery Type</option>
+                        {deliveryTypes.map((b) => (
+                          <option key={b.id} value={b.id.toLowerCase()}>
+                            {b.name.toUpperCase()}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex-1">
+                      <select
+                        onChange={(e) => setSelectedCakeType(e.target.value)}
+                        value={selectedCakeType || "all"}
+                        className="w-full px-3 py-1 border rounded-md shadow-sm focus:outline-none bg-white height-34px text-gray-700 border-pink-400 focus:ring-2 focus:ring-pink-500"
+                      >
+                        <option value="all">Cake Type</option>
+                        {cakeTypes.map((b) => (
+                          <option key={b.id} value={b.id.toLowerCase()}>
+                            {b.name.toUpperCase()}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
                 </div>
-              )}
+                <div className="px-2 mx-2 flex justify-end height-34px">
+                  {/* <div className="flex-shrink-0"> */}
+                  {(role === "admin" || role === "staff") && (
+                    <div className="flex items-center gap-2 border border-pink-400 rounded-md p-1">
+                      <button
+                        onClick={() => setViewMode("card")}
+                        className={`p-1 rounded-md ${
+                          viewMode === "card"
+                            ? "bg-pink-500 text-white"
+                            : "text-gray-600 hover:bg-pink-100"
+                        }`}
+                        aria-label="Card View"
+                      >
+                        <Table size={20} />
+                      </button>
+                      <button
+                        onClick={() => setViewMode("table")}
+                        className={`p-1 rounded-md ${
+                          viewMode === "table"
+                            ? "bg-pink-500 text-white"
+                            : "text-gray-600 hover:bg-pink-100"
+                        }`}
+                        aria-label="Table View"
+                      >
+                        <List size={20} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </>
         )}

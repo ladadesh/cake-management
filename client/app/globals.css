@@ -30,3 +30,7 @@ body {
 .bg-pink-50 {
   background-color: #fdf2f885 !important;
 }
+
+.height-34px {
+  height: 34px;
+}
